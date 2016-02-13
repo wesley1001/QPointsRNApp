@@ -1,7 +1,8 @@
 /* @flow */
 'use strict';
 
-var React = require('react-native');
+import React  from 'react-native';
+import Storage from 'react-native-store';
 
 var {
   AsyncStorage,
@@ -12,8 +13,10 @@ var {
   View
 } = React;
 
-const USEREMAIL_KEY = 'UserEmailKey';
-const USERPW_KEY = 'UserPasswordKey';
+const DB = {
+    'user': Storage.model('user')
+};
+
 
 var Login = React.createClass({
 
@@ -27,13 +30,13 @@ var Login = React.createClass({
   },
 
   componentWillMount: function() {
-    AsyncStorage.getItem(USEREMAIL_KEY, (err, userEmail) => {
-      if (err || !userEmail) {
+    DB.user.find().then((user) => {
+      if (!user) {
         console.log('no local storage');
-        console.log(err);
         this.setState({ loggedIn: false });
         return;
       }
+      console.log(user);
       this.setState({ loggedIn: true });
       this.props.navigator.replace({id: 'MyPoints'});
     });
@@ -78,14 +81,14 @@ var Login = React.createClass({
   },
 
   _onPressLogin(){
-    AsyncStorage.setItem(USEREMAIL_KEY, this.state.userEmail)
-      .then(() => {
-        console.log('userEmail has been saved in storage');
-        this.setState({
-          error: false,
-        });
-        this.props.navigator.replace({id: 'MyPoints'});
-      })
+    DB.user.add({
+      userEmail: this.state.userEmail
+    });
+    console.log('userEmail has been saved in storage');
+    this.setState({
+      error: false,
+    });
+    this.props.navigator.replace({id: 'MyPoints'});
   },
 
   render: function() {
