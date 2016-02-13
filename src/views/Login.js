@@ -13,10 +13,7 @@ var {
   View
 } = React;
 
-const DB = {
-    'user': Storage.model('user')
-};
-
+const DB = { 'user': Storage.model('user') };
 
 var Login = React.createClass({
 
@@ -30,13 +27,17 @@ var Login = React.createClass({
   },
 
   componentWillMount: function() {
-    DB.user.find().then((user) => {
+    DB.user.findById(1).then((user) => {
       if (!user) {
         console.log('no local storage');
         this.setState({ loggedIn: false });
         return;
       }
       console.log(user);
+      if (!user.loggedIn){
+        this.setState({ loggedIn: false });
+        return;
+      }
       this.setState({ loggedIn: true });
       this.props.navigator.replace({id: 'MyPoints'});
     });
@@ -81,9 +82,10 @@ var Login = React.createClass({
   },
 
   _onPressLogin(){
-    DB.user.add({
-      userEmail: this.state.userEmail
-    });
+    DB.user.updateById({
+      userEmail: this.state.userEmail,
+      loggedIn: true
+    },1);
     console.log('userEmail has been saved in storage');
     this.setState({
       error: false,
