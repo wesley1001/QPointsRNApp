@@ -55,16 +55,17 @@ var Messages = React.createClass({
     });
   },
 
-  _renderRow: function(rowData) {
-    console.log(new Date());
+  _renderRow: function(rowData, sectionID, rowID) {
     return (
       <MessageItem 
-        messageTitle={rowData.messageTitle} 
-        messageText={rowData.messageText}
-        company={rowData.company} 
-        programGoal={rowData.programGoal} 
-        messageDate={rowData.messageDate} />
+        rowID={rowID}
+        message={rowData}
+        onClick={this._itemPressed}/>
     );
+  },
+
+  _itemPressed: function(rowID) {
+    this.props.navigator.push({ id: 'Message', data: interimData.messages[rowID] });
   },
 
   render: function() {

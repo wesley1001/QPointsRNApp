@@ -10,10 +10,13 @@ var {
 } = React;
 
 var Message = React.createClass({
+
   render: function() {
+    console.log(this.props.data);
     return (
       <View style={styles.container}>
-      	<Text>Nachricht</Text>
+      	<Text>Nachricht </Text>
+        <Text>{this.props.data.messageTitle}</Text>
       </View>
     );
   }

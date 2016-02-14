@@ -12,32 +12,28 @@ var {
 
 var MessageItem = React.createClass({
 	propTypes: {
-    messageTitle: React.PropTypes.string.isRequired,
-    messageText: React.PropTypes.string.isRequired,
-    company: React.PropTypes.string.isRequired,
-    programGoal: React.PropTypes.number.isRequired,
-    messageDate: React.PropTypes.string.isRequired
+    message: React.PropTypes.object.isRequired,
+    rowID: React.PropTypes.string.isRequired,
+    onClick: React.PropTypes.func.isRequired
   },
 
   render: function() {
     return (
-      <View >
+      <TouchableHighlight onPress={() => this.props.onClick(this.props.rowID)}  underlayColor='#dddddd'>
         <View style={styles.itemContainer}>
 
           <View style={styles.itemContent} >
-            <Text style={styles.itemHeader}>{this.props.messageDate} {this.props.company}</Text>
-              <Text style={styles.itemTitle}>{this.props.messageTitle}</Text>
-              <Text>{this.props.messageText}</Text>
+            <Text style={styles.itemHeader}>{this.props.message.messageDate} {this.props.company}</Text>
+              <Text style={styles.itemTitle}>{this.props.message.messageTitle}</Text>
+              <Text>{this.props.message.messageText}</Text>
           </View>
 
           <View style={styles.itemNav}>
             <Text>></Text>
           </View>
 
-          
-
         </View>
-      </View>
+      </TouchableHighlight>
     );
   }
 });

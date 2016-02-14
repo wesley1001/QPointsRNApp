@@ -13,7 +13,7 @@ import Message from '../views/Message';
 import Profile from '../views/Profile';
 
 export default function (props){
-	switch (props.routeId){
+	switch (props.route.id){
     case 'Login':
       return (
         <View style={{flex: 1}}>
@@ -26,7 +26,7 @@ export default function (props){
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={true} displBackIcon={false} />
           <MyPoints navigator={props.navigator} />
-          <BottomBar nav={props.navigator} currentPage={props.routeId} />
+          <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );
     case 'Register':
@@ -34,7 +34,7 @@ export default function (props){
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={false} displBackIcon={true} />
           <Register navigator={props.navigator} />
-          <BottomBar nav={props.navigator} currentPage={props.routeId} />
+          <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );
     case 'Scan':
@@ -42,7 +42,7 @@ export default function (props){
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={true} displBackIcon={false} />
           <Scan navigator={props.navigator} />
-          <BottomBar nav={props.navigator} currentPage={props.routeId} />
+          <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );
     case 'Messages':
@@ -50,7 +50,7 @@ export default function (props){
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={true} displBackIcon={false} />
           <Messages navigator={props.navigator} />
-          <BottomBar nav={props.navigator} currentPage={props.routeId} />
+          <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );
     case 'Program':
@@ -58,7 +58,7 @@ export default function (props){
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={true} displBackIcon={true} />
           <Program navigator={props.navigator} />
-          <BottomBar nav={props.navigator} currentPage={props.routeId} />
+          <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );
     case 'Redeem':
@@ -66,15 +66,15 @@ export default function (props){
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={true} displBackIcon={true} />
           <Redeem navigator={props.navigator} />
-          <BottomBar nav={props.navigator} currentPage={props.routeId} />
+          <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );
     case 'Message':
     	return (
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={true} displBackIcon={true} />
-          <Message navigator={props.navigator} />
-          <BottomBar nav={props.navigator} currentPage={props.routeId} />
+          <Message navigator={props.navigator} data={props.route.data} />
+          <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );
     case 'Profile':
@@ -82,7 +82,7 @@ export default function (props){
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={false} displBackIcon={true} />
           <Profile navigator={props.navigator} />
-          <BottomBar nav={props.navigator} currentPage={props.routeId} />
+          <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );
     default:
@@ -90,7 +90,7 @@ export default function (props){
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={false} displBackIcon={false} />
           <Login navigator={props.navigator} />
-          <BottomBar nav={props.navigator} currentPage={props.routeId} />
+          <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );
   };

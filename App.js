@@ -18,7 +18,7 @@ var App = React.createClass({
 
   navigatorRenderScene: function(route, navigator){
     return (
-      <Routes routeId={route.id} navigator={navigator} />
+      <Routes route={route} navigator={navigator} />
     );
   }
 
