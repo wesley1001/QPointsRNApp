@@ -39,7 +39,7 @@ var Login = React.createClass({
         return;
       }
       this.setState({ loggedIn: true });
-      this.props.navigator.replace({id: 'MyPoints'});
+      this.props.navigator.replace({id: 'Messages'});
     });
   },
 
@@ -49,41 +49,48 @@ var Login = React.createClass({
     })
   },
 
-  _handleResponse(res){
-    console.log('this is the api.loginUser response:');
-    console.log(res);
-    if(res.success === false){
-      this.setState({
-        error: 'User not found'
-      })
-    } else {
-      AsyncStorage.setItem(USEREMAIL_KEY, this.state.userEmail)
-      .then(() => {
-        console.log('userEmail has been save in storage');
-        this.setState({
-          error: false,
-        });
-        this.props.navigator.push({
-          id: 'MyQPoints'
-        });
-      });
-    }
-  },
-
-  _onPressSubmit(){
-    console.log('will start api.loginUser. With email: ' + this.state.userEmail);
-    api.loginUser(this.state.userEmail)
-      .then((jsonRes) => this._handleResponse(jsonRes))
-      .catch((err) => {
-        this.setState({
-          error: `There was an error: ${err}`
-      });
+  _handlePWInput(inputText){
+    this.setState({
+      password: inputText
     })
   },
+
+  // _handleResponse(res){
+  //   console.log('this is the api.loginUser response:');
+  //   console.log(res);
+  //   if(res.success === false){
+  //     this.setState({
+  //       error: 'User not found'
+  //     })
+  //   } else {
+  //     AsyncStorage.setItem(USEREMAIL_KEY, this.state.userEmail)
+  //     .then(() => {
+  //       console.log('userEmail has been save in storage');
+  //       this.setState({
+  //         error: false,
+  //       });
+  //       this.props.navigator.push({
+  //         id: 'MyQPoints'
+  //       });
+  //     });
+  //   }
+  // },
+
+  // _onPressSubmit(){
+  //   console.log('will start api.loginUser. With email: ' + this.state.userEmail);
+  //   api.loginUser(this.state.userEmail)
+  //     .then((jsonRes) => this._handleResponse(jsonRes))
+  //     .catch((err) => {
+  //       this.setState({
+  //         error: `There was an error: ${err}`
+  //     });
+  //   })
+  // },
 
   _onPressLogin(){
     DB.user.updateById({
       userEmail: this.state.userEmail,
+      userPW: this.state.password,
       loggedIn: true
     },1);
     console.log('userEmail has been saved in storage');
@@ -101,6 +108,11 @@ var Login = React.createClass({
           keyboardType='email-address'
           placeholder='Bitte email eingeben'
           onChangeText={(text) => this._handleUserInput(text)} />
+        <TextInput
+          style={styles.input}
+          keyboardType='default'
+          placeholder='Passwort'
+          onChangeText={(text) => this._handlePWInput(text)} />
 
         <TouchableHighlight
           style={styles.button}
