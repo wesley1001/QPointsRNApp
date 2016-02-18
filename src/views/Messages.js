@@ -3,6 +3,7 @@
 
 import React from 'react-native';
 import MessageItem from '../components/MessageItem';
+import getMessages from '../components/Api';
 
 var {
   ListView,
@@ -10,35 +11,6 @@ var {
   Text,
   View
 } = React;
-
-const interimData = {
-  messages: [
-    {
-      messageTitle: 'Heute unsere neuen Sorten1',
-      messageText: 'Liebe Kunden, heute zwischen 15 und 17 Uhr findet Ice-Happy-Hour statt',
-      programName: '3 für 1 Eis',
-      company: 'Eishaus',
-      programGoal: 3,
-      messageDate: '2016-02-11'
-    },
-    {
-      messageTitle: 'Heute unsere neuen Sorten2',
-      messageText: 'Liebe Kunden, heute zwischen 15 und 17 Uhr findet Ice-Happy-Hour statt',
-      programName: '3 für 1 Eis',
-      company: 'Eishaus',
-      programGoal: 3,
-      messageDate: '2016-02-11'
-    },
-    {
-      messageTitle: 'Heute unsere neuen Sorten3',
-      messageText: 'Liebe Kunden, heute zwischen 15 und 17 Uhr findet Ice-Happy-Hour statt',
-      programName: '3 für 1 Eis',
-      company: 'Eishaus',
-      programGoal: 3,
-      messageDate: '2016-02-12'
-    }
-  ]
-};
 
 var Messages = React.createClass({
 
@@ -50,8 +22,14 @@ var Messages = React.createClass({
   },
 
   componentWillMount() {
-    this.setState({
-      dataSource: this.state.dataSource.cloneWithRows(interimData.messages)
+    this.refreshData();
+  },
+
+  refreshData() {
+    getMessages().then((response) => {
+      this.setState({
+          dataSource: this.state.dataSource.cloneWithRows(response.newsFeed)
+      });
     });
   },
 
@@ -65,7 +43,7 @@ var Messages = React.createClass({
   },
 
   _itemPressed: function(rowID) {
-    this.props.navigator.push({ id: 'Message', data: interimData.messages[rowID] });
+    this.props.navigator.push({ id: 'Message', data: this.state.dataSource._dataBlob.s1[rowID] });
   },
 
   render: function() {

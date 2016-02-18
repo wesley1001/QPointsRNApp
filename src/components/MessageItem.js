@@ -23,9 +23,9 @@ var MessageItem = React.createClass({
         <View style={styles.itemContainer}>
 
           <View style={styles.itemContent} >
-            <Text style={styles.itemHeader}>{this.props.message.messageDate} {this.props.company}</Text>
-              <Text style={styles.itemTitle}>{this.props.message.messageTitle}</Text>
-              <Text>{this.props.message.messageText}</Text>
+            <Text style={styles.itemHeader}>{this.props.message.newsDate} {this.props.message.company}</Text>
+              <Text style={styles.itemTitle}>{this.props.message.newsTitle}</Text>
+              <Text>{this.props.message.newsMessage}</Text>
           </View>
 
           <View style={styles.itemNav}>

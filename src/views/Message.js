@@ -15,8 +15,16 @@ var Message = React.createClass({
     console.log(this.props.data);
     return (
       <View style={styles.container}>
-      	<Text>Nachricht </Text>
-        <Text>{this.props.data.messageTitle}</Text>
+        <View style={styles.titel}>
+          <Text>{this.props.data.newsTitle}</Text>
+        </View>
+        <View style={styles.header}>
+          <Text>{this.props.data.company} - {this.props.data.programName} </Text>
+          <Text>{this.props.data.newsDate} </Text>
+        </View>
+      	<View style={styles.content}>
+          <Text>{this.props.data.newsMessage}</Text>
+        </View>
       </View>
     );
   }
@@ -29,6 +37,25 @@ var styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#9DC02E',
   },
+  titel: {
+    flex: 1,
+    justifyContent: 'center',
+    // borderColor: 'white',
+    // borderWidth: 1
+  },
+  header: {
+    flex: 1,
+    justifyContent: 'center',
+    // borderColor: 'white',
+    // borderWidth: 1
+  },
+  content: {
+    flex: 5,
+    padding: 10,
+    // borderColor: 'white',
+    // borderWidth: 1
+  },
+
 });
 
 module.exports = Message;
