@@ -3,7 +3,8 @@
 
 import React from 'react-native';
 import MessageItem from '../components/MessageItem';
-import getMessages from '../components/Api';
+import getMessages from '../components/ApiMessages';
+import Storage from 'react-native-store';
 
 var {
   ListView,
@@ -12,12 +13,14 @@ var {
   View
 } = React;
 
+const DB = { 'user': Storage.model('user') };
+
 var Messages = React.createClass({
 
   getInitialState() {
     var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-      return {
-        dataSource: ds.cloneWithRows([])
+    return {
+      dataSource: ds.cloneWithRows([])
     };
   },
 
@@ -26,10 +29,15 @@ var Messages = React.createClass({
   },
 
   refreshData() {
-    getMessages().then((response) => {
-      this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(response.newsFeed)
-      });
+    DB.user.findById(1).then((resp) => {
+      getMessages(resp.userEmail, resp.userPW)
+        .then((response) => {
+          this.setState({
+              dataSource: this.state.dataSource.cloneWithRows(response.newsFeed)
+          });
+        })
+        .catch((err) => console.log(`There was an error: ${err}`));
+
     });
   },
 

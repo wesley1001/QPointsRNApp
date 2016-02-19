@@ -15,6 +15,24 @@ const DB = { 'user': Storage.model('user') };
 
 var Profile = React.createClass({
 
+  getInitialState(){
+    return {
+      userEmail: '',
+      userGender: ''
+    };
+  },
+
+  componentWillMount(){
+    DB.user.findById(1).then((resp) => {
+      console.log('Storage is');
+      this.setState({
+        userEmail: resp.userEmail,
+        userGender: resp.userGender
+      });
+      console.log(resp);
+    });
+  },
+
   _onPressLogout(){
     DB.user.updateById({
       loggedIn: false 
@@ -28,6 +46,8 @@ var Profile = React.createClass({
     return (
       <View style={styles.container}>
       	<Text>Profile-Details</Text>
+        <Text>{this.state.userEmail}</Text>
+        <Text>{this.state.userGender}</Text>
         <Text></Text>
         <TouchableHighlight
           style={styles.button}

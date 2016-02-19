@@ -1,7 +1,7 @@
 /* @flow */
 'use strict';
 
-var React = require('react-native');
+import React from 'react-native';
 
 var {
   StyleSheet,
@@ -55,7 +55,6 @@ var styles = StyleSheet.create({
     // borderColor: 'white',
     // borderWidth: 1
   },
-
 });
 
 module.exports = Message;

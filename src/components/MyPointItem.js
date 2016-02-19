@@ -1,7 +1,7 @@
 /* MessageItem */
 'use strict';
 
-var React = require('react-native');
+import React from 'react-native';
 
 var {
   StyleSheet,
@@ -10,9 +10,9 @@ var {
   View
 } = React;
 
-var MessageItem = React.createClass({
+var MyPointItem = React.createClass({
 	propTypes: {
-    message: React.PropTypes.object.isRequired,
+    programData: React.PropTypes.object.isRequired,
     rowID: React.PropTypes.string.isRequired,
     onClick: React.PropTypes.func.isRequired
   },
@@ -23,9 +23,9 @@ var MessageItem = React.createClass({
         <View style={styles.itemContainer}>
 
           <View style={styles.itemContent} >
-            <Text style={styles.itemHeader}>{this.props.message.newsDate} {this.props.message.company}</Text>
-              <Text style={styles.itemTitle}>{this.props.message.newsTitle}</Text>
-              <Text style={styles.itemText}>{this.props.message.newsMessage}</Text>
+            <Text style={styles.itemHeader}>{this.props.programData.programCompany}</Text>
+              <Text style={styles.itemTitle}>{this.props.programData.programName}</Text>
+              <Text>{this.props.programData.myCount} / {this.props.programData.programGoal}</Text>
           </View>
 
           <View style={styles.itemNav}>
@@ -62,10 +62,10 @@ var styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center'
   },
-  itemText: {
-    height: 50
+  separator: {
+    
   },
 });
 
 
-module.exports = MessageItem;
+module.exports = MyPointItem;

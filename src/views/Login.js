@@ -3,9 +3,9 @@
 
 import React  from 'react-native';
 import Storage from 'react-native-store';
+import getUserData from '../components/ApiUserData';
 
 var {
-  AsyncStorage,
   StyleSheet,
   Text,
   TextInput,
@@ -20,7 +20,7 @@ var Login = React.createClass({
   getInitialState: function() {
     return {
       userEmail: '',
-      password: '',
+      userPW: '',
       loggedIn: false,
       error: false
     };
@@ -33,13 +33,12 @@ var Login = React.createClass({
         this.setState({ loggedIn: false });
         return;
       }
-      console.log(user);
       if (!user.loggedIn){
         this.setState({ loggedIn: false });
         return;
       }
       this.setState({ loggedIn: true });
-      this.props.navigator.replace({id: 'Messages'});
+      this.props.navigator.replace({id: 'MyPoints'});
     });
   },
 
@@ -51,56 +50,48 @@ var Login = React.createClass({
 
   _handlePWInput(inputText){
     this.setState({
-      password: inputText
+      userPW: inputText
     })
   },
 
-  // _handleResponse(res){
-  //   console.log('this is the api.loginUser response:');
-  //   console.log(res);
-  //   if(res.success === false){
-  //     this.setState({
-  //       error: 'User not found'
-  //     })
-  //   } else {
-  //     AsyncStorage.setItem(USEREMAIL_KEY, this.state.userEmail)
-  //     .then(() => {
-  //       console.log('userEmail has been save in storage');
-  //       this.setState({
-  //         error: false,
-  //       });
-  //       this.props.navigator.push({
-  //         id: 'MyQPoints'
-  //       });
-  //     });
-  //   }
-  // },
-
-  // _onPressSubmit(){
-  //   console.log('will start api.loginUser. With email: ' + this.state.userEmail);
-  //   api.loginUser(this.state.userEmail)
-  //     .then((jsonRes) => this._handleResponse(jsonRes))
-  //     .catch((err) => {
-  //       this.setState({
-  //         error: `There was an error: ${err}`
-  //     });
-  //   })
-  // },
+  _handleResponse(res){
+    if(res.success === false){
+      console.log('User not found');
+      this.setState({
+        error: res.message,
+        loggedIn: false
+      });
+    } else {
+      this.setState({
+        error: '',
+        loggedIn: true
+      });
+      let userProgramData = res.programData ? res.programData : '';
+      DB.user.updateById({
+        userEmail: this.state.userEmail,
+        userPW: this.state.userPW,
+        userGender: res.gender,
+        loggedIn: true,
+        userPoints: userProgramData
+      },1).then(() => this.props.navigator.replace({id: 'MyPoints'}));
+    }
+  },
 
   _onPressLogin(){
-    DB.user.updateById({
-      userEmail: this.state.userEmail,
-      userPW: this.state.password,
-      loggedIn: true
-    },1);
-    console.log('userEmail has been saved in storage');
-    this.setState({
-      error: false,
-    });
-    this.props.navigator.replace({id: 'MyPoints'});
+    getUserData(this.state.userEmail, this.state.userPW)
+      .then((response) => {
+        this._handleResponse(response);
+      })
+      .catch((err) => console.log(`There was an error: ${err}`));
   },
 
   render: function() {
+    var warningText;
+    if (this.state.error){
+      warningText = (<Text style={styles.warningText}>{this.state.error}</Text>);
+    } else {
+      warningText = (<Text></Text>);
+    }
     return (
       <View style={styles.container}>
       	<TextInput
@@ -119,6 +110,7 @@ var Login = React.createClass({
           onPress ={() => this._onPressLogin()} >
           <Text style={styles.buttonText} >Login</Text>
         </TouchableHighlight>
+        {warningText}
       </View>
     );
   }
@@ -158,6 +150,9 @@ var styles = StyleSheet.create({
     alignSelf: 'stretch',
     justifyContent: 'center'
   },
+  warningText: {
+    margin: 20
+  }
 });
 
 module.exports = Login;
