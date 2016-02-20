@@ -85,6 +85,10 @@ var Login = React.createClass({
       .catch((err) => console.log(`There was an error: ${err}`));
   },
 
+  _onPressSignin(){
+    this.props.navigator.push({id: 'Register'})
+  },
+
   render: function() {
     var warningText;
     if (this.state.error){
@@ -111,6 +115,11 @@ var Login = React.createClass({
           <Text style={styles.buttonText} >Login</Text>
         </TouchableHighlight>
         {warningText}
+        <TouchableHighlight
+          style={styles.button}
+          onPress ={() => this._onPressSignin()} >
+          <Text style={styles.buttonText} >Konto erstellen</Text>
+        </TouchableHighlight>
       </View>
     );
   }
