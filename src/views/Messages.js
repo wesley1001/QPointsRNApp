@@ -25,20 +25,36 @@ var Messages = React.createClass({
   },
 
   componentWillMount() {
-    this.refreshData();
+    this.initUserData();
   },
 
-  refreshData() {
-    DB.user.findById(1).then((resp) => {
-      getMessages(resp.userEmail, resp.userPW)
-        .then((response) => {
-          this.setState({
-              dataSource: this.state.dataSource.cloneWithRows(response.newsFeed)
-          });
-        })
-        .catch((err) => console.log(`There was an error: ${err}`));
+  initUserData() {
+    DB.user.findById(1)
+      .then((storedUserData) => {
+        var userMessage = (storedUserData.userMessages.length !=0) ? storedUserData.userMessages : '';
+        this.setState({
+          dataSource: this.state.dataSource.cloneWithRows(userMessage)
+        });
+        return storedUserData;
+      })
+      .then((storedUserData) => {
+        this.updateUserData(storedUserData)        
+      });
+  },
 
-    });
+  updateUserData(storedUserData) {
+    getMessages(storedUserData.userEmail, storedUserData.userPW)
+      .then((response) => {
+        if (response.newsFeed) {
+          storedUserData.userMessages = storedUserData.userMessages.concat(response.newsFeed);
+          DB.user.updateById(storedUserData,1).then((storedUserData) => {
+            this.setState({
+              dataSource: this.state.dataSource.cloneWithRows(storedUserData.userMessages)
+            });
+          });
+        }
+      })
+      .catch((err) => console.log(`There was an error: ${err}`));
   },
 
   _renderRow: function(rowData, sectionID, rowID) {

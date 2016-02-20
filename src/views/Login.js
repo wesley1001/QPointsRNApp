@@ -72,7 +72,8 @@ var Login = React.createClass({
         userPW: this.state.userPW,
         userGender: res.gender,
         loggedIn: true,
-        userPoints: userProgramData
+        userPoints: userProgramData,
+        userMessages: []
       },1).then(() => this.props.navigator.replace({id: 'MyPoints'}));
     }
   },
