@@ -6,6 +6,7 @@ import Storage from 'react-native-store';
 import getUserData from '../components/ApiUserData';
 
 var {
+  AsyncStorage,
   StyleSheet,
   Text,
   TextInput,
@@ -14,6 +15,15 @@ var {
 } = React;
 
 const DB = { 'user': Storage.model('user') };
+
+// DB.user.add({
+//   userEmail: 'kim.sora@web.de',
+//   userPW: '1234',
+//   userGender: 1,
+//   loggedIn: false,
+//   userPoints: '',
+//   userMessages: []
+// });
 
 var Login = React.createClass({
 
@@ -28,6 +38,7 @@ var Login = React.createClass({
 
   componentWillMount: function() {
     DB.user.findById(1).then((user) => {
+      console.log(user);
       if (!user) {
         console.log('no local storage');
         this.setState({ loggedIn: false });
@@ -81,6 +92,7 @@ var Login = React.createClass({
   _onPressLogin(){
     getUserData(this.state.userEmail, this.state.userPW)
       .then((response) => {
+        console.log(response);
         this._handleResponse(response);
       })
       .catch((err) => console.log(`There was an error: ${err}`));

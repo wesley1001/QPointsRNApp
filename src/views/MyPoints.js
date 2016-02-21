@@ -29,9 +29,11 @@ var MyPoints = React.createClass({
 
   refreshData() {
     DB.user.findById(1).then((resp) => {
-      this.setState({
-        dataSource: this.state.dataSource.cloneWithRows(resp.userPoints)
-      });
+      if (resp) {
+        this.setState({
+          dataSource: this.state.dataSource.cloneWithRows(resp.userPoints)
+        });
+      }
     });
   },
 

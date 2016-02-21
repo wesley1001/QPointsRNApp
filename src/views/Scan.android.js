@@ -13,7 +13,7 @@ var Scan = React.createClass({
   render: function() {
     return (
       <View style={styles.container}>
-      	<Text>Scan</Text>
+      	<Text>Scan for Android</Text>
       </View>
     );
   }
