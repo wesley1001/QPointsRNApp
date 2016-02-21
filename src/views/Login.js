@@ -16,14 +16,19 @@ var {
 
 const DB = { 'user': Storage.model('user') };
 
-// DB.user.add({
-//   userEmail: 'kim.sora@web.de',
-//   userPW: '1234',
-//   userGender: 1,
-//   loggedIn: false,
-//   userPoints: '',
-//   userMessages: []
-// });
+DB.user.find().then((response) => {
+  if (!response) {
+    DB.user.add({
+      userEmail: 'kim.sora@web.de',
+      userPW: '1234',
+      userGender: 1,
+      loggedIn: false,
+      userPoints: '',
+      userMessages: []
+    });
+  }
+  console.log(response);
+});
 
 var Login = React.createClass({
 

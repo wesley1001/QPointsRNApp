@@ -1,5 +1,5 @@
 function getData(userEmail, pw) {
-	let source = 'http://localhost:3000/apinewsfeed';
+	let source = 'http://192.168.2.104:3000/apinewsfeed';
 	return fetch(source, {
 		method: 'POST',
 		headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
