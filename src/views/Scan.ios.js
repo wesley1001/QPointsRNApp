@@ -3,7 +3,7 @@
 
 import React from 'react-native';
 import Camera  from 'react-native-camera';
-import CheckCode from '../components/ApiCheckCode';
+import {CheckCode} from '../components/ApiUtils';
 import Storage from 'react-native-store';
 
 var {
@@ -62,29 +62,36 @@ var Scan = React.createClass({
   _onBarCodeRead: function(e) {
     this.setState({showCamera: false});
     CheckCode(this.state.userEmail, e.data).then((response) => {
+      var alertTitle;
+      if (response.success === false) {
+        alertTitle = 'Leider ist der QR-Code nicht gültig';
+      } else {
+        alertTitle = 'Herzliche Glückwünsche';
+        this.updateUserData(response.nr);
+      }
       AlertIOS.alert(
-          "Barcode Found",
+          alertTitle,
           response.message
       );
-
-      var userPoints = this.state.userPoints;
-      var foundIndex = userPoints.findIndex(function(item) {
-        return (item.programNr === response.nr);
-      });
-      userPoints[foundIndex].myCount += 1;
-      if (userPoints[foundIndex].myCount == userPoints[foundIndex].programGoal){
-        userPoints[foundIndex].myCount = 0;
-        userPoints[foundIndex].ProgramsFinished += 1;
-      }
-      DB.user.updateById({
-        userPoints: userPoints
-      },1)
-
       this.setState({showCamera: true});  
     });
-    
-  }
+  },
 
+  updateUserData(codeProgramNr){
+    var userPoints = this.state.userPoints;
+    var foundIndex = userPoints.findIndex(function(item) {
+      return (item.programNr === codeProgramNr);
+    });
+    userPoints[foundIndex].myCount += 1;
+    if (userPoints[foundIndex].myCount == userPoints[foundIndex].programGoal){
+      userPoints[foundIndex].myCount = 0;
+      userPoints[foundIndex].ProgramsFinished += 1;
+    }
+    DB.user.updateById({
+      userPoints: userPoints
+    },1)
+  }
+  
 });
 
 var styles = StyleSheet.create({
@@ -93,7 +100,7 @@ var styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#9DC02E',
-  },
+  }
 });
 
 module.exports = Scan;

@@ -3,7 +3,7 @@
 
 import React from 'react-native';
 import MessageItem from '../components/MessageItem';
-import getMessages from '../components/ApiMessages';
+import {getMessages} from '../components/ApiUtils';
 import Storage from 'react-native-store';
 
 var {

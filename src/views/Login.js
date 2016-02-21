@@ -3,7 +3,7 @@
 
 import React  from 'react-native';
 import Storage from 'react-native-store';
-import getUserData from '../components/ApiUserData';
+import {getUserData} from '../components/ApiUtils';
 
 var {
   AsyncStorage,

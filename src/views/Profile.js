@@ -3,7 +3,7 @@
 
 import React from 'react-native';
 import Storage from 'react-native-store';
-import updateProfile from '../components/ApiUpdateProfile';
+import {updateProfile} from '../components/ApiUtils';
 
 var {
   StyleSheet,
