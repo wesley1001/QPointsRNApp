@@ -2,7 +2,7 @@ const serverHost = 'localhost';
 // const serverHost = '172.20.10.2';
 
 export function CheckCode(userEmail, code) {
-	let source = 'http://' + serverHost + ':3000/apicodecheck';
+	let source = 'http://' + serverHost + ':3000/api/v1/codecheck';
 	return fetch(source, {
 		method: 'POST',
 		headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
@@ -13,7 +13,7 @@ export function CheckCode(userEmail, code) {
 }
 
 export function getUserData(userEmail, userPW) {
-	let source = 'http://' + serverHost + ':3000/apicheckuser';
+	let source = 'http://' + serverHost + ':3000/api/v1/checkuser';
 	return fetch(source, {
 		method: 'POST',
 		headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
@@ -24,7 +24,7 @@ export function getUserData(userEmail, userPW) {
 }
 
 export function createAccount(userEmail, pw) {
-	let source = 'http://' + serverHost + ':3000/apicreateaccount';
+	let source = 'http://' + serverHost + ':3000/api/v1/createaccount';
 	return fetch(source, {
 		method: 'POST',
 		headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
@@ -35,7 +35,7 @@ export function createAccount(userEmail, pw) {
 }
 
 export function getMessages(userEmail, pw) {
-	let source = 'http://' + serverHost + ':3000/apinewsfeed';
+	let source = 'http://' + serverHost + ':3000/api/v1/newsfeed';
 	return fetch(source, {
 		method: 'POST',
 		headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
@@ -46,7 +46,7 @@ export function getMessages(userEmail, pw) {
 }
 
 export function updateProfile(userEmail, currentPW, gender, newPW) {
-	let source = 'http://' + serverHost + ':3000/apiupdateuser';
+	let source = 'http://' + serverHost + ':3000/api/v1/updateuser';
 	return fetch(source, {
 		method: 'POST',
 		headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
