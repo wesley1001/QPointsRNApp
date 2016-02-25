@@ -6,23 +6,44 @@ import React from 'react-native';
 var {
   StyleSheet,
   Text,
+  TouchableHighlight,
   View
 } = React;
 
 var Program = React.createClass({
+
+  _onPressRedeem(){
+    this.props.navigator.push({id: 'Redeem'})
+  },
+
   render: function() {
+    var programData = this.props.data;
+    console.log(programData);
+
+    var redeemBtn = (programData.ProgramsFinished != 0)? (
+      <TouchableHighlight
+        style={styles.button}
+        onPress ={() => this._onPressRedeem()} >
+        <Text style={styles.buttonText} >QPoints einlösen</Text>
+      </TouchableHighlight>
+      ) : '';
     return (
       <View style={styles.container}>
         <View style={styles.titel}>
-          <Text>{this.props.data.programName}</Text>
+          <Text>{programData.programName}</Text>
         </View>
         <View style={styles.header}>
-          <Text>{this.props.data.programCompany} - {this.props.data.companyCity} </Text>
-          <Text>{this.props.data.myCount} / {this.props.data.programGoal} </Text>
+          <Text>{programData.myCount} von {programData.programGoal} QPoints</Text>
+          <Text>Bereits einlösbare Treffer {programData.ProgramsFinished}</Text>
         </View>
         <View style={styles.content}>
-          <Text>{this.props.data.ProgramsFinished}</Text>
+          <Text>{programData.programCompany}</Text>
+          <Text>{programData.address1}</Text>
+          <Text>{programData.address2}</Text>
+          <Text>{programData.zip} {programData.companyCity}</Text>
+          <Text>{programData.phone} </Text>
         </View>
+        {redeemBtn}
       </View>
     );
   }
@@ -48,11 +69,27 @@ var styles = StyleSheet.create({
     // borderWidth: 1
   },
   content: {
-    flex: 5,
+    flex: 3,
     padding: 10,
     // borderColor: 'white',
     // borderWidth: 1
   },
+  buttonText: {
+    fontSize: 18,
+    color: '#111',
+    alignSelf: 'center'
+  },
+  button: {
+    height: 40,
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    borderColor: 'white',
+    borderWidth: 1,
+    borderRadius: 8,
+    margin: 20,
+    alignSelf: 'stretch',
+    justifyContent: 'center'
+  }
 });
 
 module.exports = Program;
