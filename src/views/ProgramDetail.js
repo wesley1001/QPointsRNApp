@@ -13,7 +13,7 @@ var {
 var Program = React.createClass({
 
   _onPressRedeem(){
-    this.props.navigator.push({id: 'Redeem'})
+    this.props.navigator.push({id: 'Redeem', data: this.props.data})
   },
 
   render: function() {

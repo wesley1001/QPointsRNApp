@@ -10,7 +10,10 @@ var {
 } = React;
 
 var Redeem = React.createClass({
+
   render: function() {
+    console.log('jetzt auf Redeem View');
+    console.log(this.props.data);
     return (
       <View style={styles.container}>
       	<Text>Punkte einlösen</Text>
