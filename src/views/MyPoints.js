@@ -47,7 +47,7 @@ var MyPoints = React.createClass({
   },
 
   _itemPressed: function(rowID) {
-    this.props.navigator.push({ id: 'Program', data: this.state.dataSource._dataBlob.s1[rowID] });
+    this.props.navigator.push({ id: 'ProgramDetail', data: this.state.dataSource._dataBlob.s1[rowID] });
   },
 
   render: function() {

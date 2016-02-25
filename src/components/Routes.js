@@ -7,7 +7,7 @@ import Register from '../views/Register';
 import MyPoints from '../views/MyPoints';
 import Scan from '../views/Scan';
 import Messages from '../views/Messages';
-import Program from '../views/Program';
+import ProgramDetail from '../views/ProgramDetail';
 import Redeem from '../views/Redeem';
 import Message from '../views/Message';
 import Profile from '../views/Profile';
@@ -53,11 +53,11 @@ export default function (props){
           <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );
-    case 'Program':
+    case 'ProgramDetail':
     	return (
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={true} displBackIcon={true} />
-          <Program navigator={props.navigator} data={props.route.data} />
+          <ProgramDetail navigator={props.navigator} data={props.route.data} />
           <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );

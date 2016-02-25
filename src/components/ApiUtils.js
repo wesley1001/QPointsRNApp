@@ -1,5 +1,5 @@
-// const serverHost = 'localhost';
-const serverHost = '192.168.2.104';
+const serverHost = 'localhost';
+// const serverHost = '172.20.10.2';
 
 export function CheckCode(userEmail, code) {
 	let source = 'http://' + serverHost + ':3000/apicodecheck';
