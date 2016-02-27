@@ -55,3 +55,14 @@ export function updateProfile(userEmail, currentPW, gender, newPW) {
 		return response.json();
 	});
 }
+
+export function redeemPoint(userEmail, programNr, programGoal) {
+	let source = 'http://' + serverHost + ':3000/api/v1/coderedeem';
+	return fetch(source, {
+		method: 'POST',
+		headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+		body: JSON.stringify({ userEmail: userEmail, programNr: programNr, programGoal: programGoal })
+	}).then((response) => {
+		return response.json();
+	});
+}

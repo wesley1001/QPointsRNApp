@@ -30,7 +30,8 @@ var MyPointItem = React.createClass({
           </View>
           <View style={styles.itemContent} >
             <Text style={styles.itemHeader}>{programData.programCompany}</Text>
-              <Text style={styles.itemTitle}>{programData.programName}</Text>
+            <Text style={styles.itemTitle}>{programData.ProgramsFinished}</Text>
+            <Text style={styles.itemTitle}>{programData.programName}</Text>
           </View>
 
           <View style={styles.itemNav}>

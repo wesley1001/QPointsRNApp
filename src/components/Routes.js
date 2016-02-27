@@ -57,7 +57,7 @@ export default function (props){
     	return (
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={true} displBackIcon={true} />
-          <ProgramDetail navigator={props.navigator} data={props.route.data} />
+          <ProgramDetail navigator={props.navigator} data={props.route.data} userEmail={props.route.userEmail}/>
           <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );
@@ -65,7 +65,7 @@ export default function (props){
     	return (
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={true} displBackIcon={true} />
-          <Redeem navigator={props.navigator} data={props.route.data} />
+          <Redeem navigator={props.navigator} data={props.route.data} userEmail={props.route.userEmail} />
           <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );

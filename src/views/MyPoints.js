@@ -19,7 +19,8 @@ var MyPoints = React.createClass({
   getInitialState() {
     var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
       return {
-        dataSource: ds.cloneWithRows([])
+        dataSource: ds.cloneWithRows([]),
+        userEmail: ''
     };
   },
 
@@ -31,7 +32,8 @@ var MyPoints = React.createClass({
     DB.user.findById(1).then((resp) => {
       if (resp) {
         this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(resp.userPoints)
+          dataSource: this.state.dataSource.cloneWithRows(resp.userPoints),
+          userEmail: resp.userEmail
         });
       }
     });
@@ -47,7 +49,11 @@ var MyPoints = React.createClass({
   },
 
   _itemPressed: function(rowID) {
-    this.props.navigator.push({ id: 'ProgramDetail', data: this.state.dataSource._dataBlob.s1[rowID] });
+    this.props.navigator.push({
+      id: 'ProgramDetail',
+      data: this.state.dataSource._dataBlob.s1[rowID],
+      userEmail: this.state.userEmail
+    });
   },
 
   render: function() {

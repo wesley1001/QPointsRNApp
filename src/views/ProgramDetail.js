@@ -13,11 +13,16 @@ var {
 var Program = React.createClass({
 
   _onPressRedeem(){
-    this.props.navigator.push({id: 'Redeem', data: this.props.data})
+    this.props.navigator.push({
+      id: 'Redeem',
+      data: this.props.data,
+      userEmail: this.props.userEmail
+    })
   },
 
   render: function() {
     var programData = this.props.data;
+    console.log('I am in ProgramDetail');
     console.log(programData);
 
     var redeemBtn = (programData.ProgramsFinished != 0)? (
@@ -26,7 +31,7 @@ var Program = React.createClass({
         onPress ={() => this._onPressRedeem()} >
         <Text style={styles.buttonText} >QPoints einlösen</Text>
       </TouchableHighlight>
-      ) : '';
+      ) : (<Text/>);
     return (
       <View style={styles.container}>
         <View style={styles.titel}>
