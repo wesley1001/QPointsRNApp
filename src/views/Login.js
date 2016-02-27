@@ -27,7 +27,7 @@ DB.user.find().then((response) => {
       userMessages: []
     });
   }
-  console.log(response);
+  // console.log(response);
 });
 
 var Login = React.createClass({
@@ -43,7 +43,6 @@ var Login = React.createClass({
 
   componentWillMount: function() {
     DB.user.findById(1).then((user) => {
-      console.log(user);
       if (!user) {
         console.log('no local storage');
         this.setState({ loggedIn: false });
@@ -83,13 +82,15 @@ var Login = React.createClass({
         loggedIn: true
       });
       let userProgramData = res.programData ? res.programData : '';
+      let recordDate = Date.parse(new Date());
       DB.user.updateById({
         userEmail: this.state.userEmail,
         userPW: this.state.userPW,
         userGender: res.gender,
         loggedIn: true,
         userPoints: userProgramData,
-        userMessages: []
+        userMessages: [],
+        lastSync: recordDate
       },1).then(() => this.props.navigator.replace({id: 'MyPoints'}));
     }
   },
@@ -97,7 +98,6 @@ var Login = React.createClass({
   _onPressLogin(){
     getUserData(this.state.userEmail, this.state.userPW)
       .then((response) => {
-        console.log(response);
         this._handleResponse(response);
       })
       .catch((err) => console.log(`There was an error: ${err}`));
