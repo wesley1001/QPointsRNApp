@@ -22,7 +22,6 @@ var Redeem = React.createClass({
   getInitialState: function() {
     return {
       programKey: '',
-      verificationState: false,
       userPoints: ''
     };
   },
@@ -47,7 +46,6 @@ var Redeem = React.createClass({
       .then((response) => {
         var programNr = this.props.data.programNr;
         if (response.success===true){
-          console.log('Yeah - kann eingelöst werden');
           this.props.data.ProgramsFinished -= 1;
           var userPoints = this.state.userPoints;
           var foundIndex = userPoints.findIndex(function(item) {
@@ -57,23 +55,19 @@ var Redeem = React.createClass({
           DB.user.updateById({
             userPoints: userPoints
           },1).then(() => {
-            this.setState({
-              verificationState: true
-            });
             this.props.navigator.popToRoute(this.props.navigator.getCurrentRoutes()[1]);
           });
         } else {
           Alert.alert(
-            'QPoint konnte nicht eingelöst werden',
+            'QPoint could not be redeemed',
             response.message,
             [
               {text: 'OK', onPress: () => {
                 this.props.navigator.pop();
                 console.log('Konnte leider nicht eingelöst werden');
-            }},
+              }},
             ]
           );
-          
         }
       });
   },
