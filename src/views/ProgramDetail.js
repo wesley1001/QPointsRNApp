@@ -2,28 +2,84 @@
 'use strict';
 
 import React from 'react-native';
+import Storage from 'react-native-store';
+import {redeemPoint} from '../components/ApiUtils';
 
 var {
+  Alert,
   StyleSheet,
   Text,
+  TextInput,
   TouchableHighlight,
   View
 } = React;
+
+const DB = { 'user': Storage.model('user') };
 
 var Program = React.createClass({
 
   getInitialState() {
     return {
-      redeemStatus: false
+      programKey: '',
+      redeemStatus: false,
+      userPoints: ''
     };
   },
 
-  _onPressRedeem(){
-    this.props.navigator.push({
-      id: 'Redeem',
-      data: this.props.data,
-      userEmail: this.props.userEmail
+  componentWillMount() {
+    DB.user.findById(1)
+      .then((storedUserData) => {
+        this.setState({
+          userPoints: storedUserData.userPoints
+        });
+      });
+  },
+
+  _handleKeyInput(inputText){
+    this.setState({
+      programKey: inputText
     })
+  },
+
+  _onPressKeyVerification(){
+    redeemPoint(this.props.userEmail, this.props.data.programNr, this.props.data.programGoal)
+      .then((response) => {
+        var programNr = this.props.data.programNr;
+        if (response.success===true){
+          this.props.data.ProgramsFinished -= 1;
+          var userPoints = this.state.userPoints;
+          var foundIndex = userPoints.findIndex(function(item) {
+            return (item.programNr === programNr);
+          });
+          userPoints[foundIndex].ProgramsFinished -= 1;
+          DB.user.updateById({
+            userPoints: userPoints
+          },1).then(() => {
+            this.setState({
+              redeemStatus: false 
+            });
+          });
+        } else {
+          Alert.alert(
+            'QPoint could not be redeemed',
+            response.message,
+            [
+              {text: 'OK', onPress: () => {
+                this.setState({
+                  redeemStatus: false 
+                });
+                console.log('Konnte leider nicht eingelöst werden');
+              }},
+            ]
+          );
+        }
+      });
+  },
+
+  _onPressRedeem(){
+    this.setState({
+      redeemStatus: true
+    });
   },
 
   render: function() {
@@ -36,12 +92,28 @@ var Program = React.createClass({
         onPress ={() => this._onPressRedeem()} >
         <Text style={styles.buttonText} >QPoints einlösen</Text>
       </TouchableHighlight>
+      ) : (this.state.redeemStatus===true) ? (
+      <TouchableHighlight
+        style={styles.button}
+        onPress ={() => this._onPressKeyVerification()} >
+        <Text style={styles.buttonText} >Verifizieren & Einlösen</Text>
+      </TouchableHighlight>
       ) : (<Text/>);
     var collected = (programData.ProgramsFinished > 0) ? (
       <View style={styles.infoCircle}>
         <Text style={styles.infoText}>{programData.ProgramsFinished}</Text>
       </View>
-      ) : (<View style={styles.subContentInfo}><Text style={styles.subContentHeader}>0</Text></View>);
+      ) : (<View style={styles.subContentFrame}><Text style={styles.contentText}>0</Text></View>);
+    var keyInput = (this.state.redeemStatus===true) ? (
+      <View style={styles.inputFrame}>
+        <Text style={styles.inputText}>Bitten Sie den Ladeninhaber um den Einlöse-Schlüssel und geben Sie diesen hier ein</Text>
+        <TextInput
+          style={styles.input}
+          keyboardType='default'
+          placeholder='Einlöse-Schlüssel'
+          onChangeText={(text) => this._handleKeyInput(text)} />
+      </View>
+      ) : (<Text></Text>);
     var startDate = programData.programStartDate.slice(8,10) + '.'
       + programData.programStartDate.slice(5,7) + '.'
       + programData.programStartDate.slice(0,4);
@@ -54,6 +126,7 @@ var Program = React.createClass({
           <View style={styles.headerFrame}>
             <Text style={styles.headerTitle}>{programData.programCompany}</Text>
             <Text style={styles.headerSubTitle}>{programData.programName}</Text>
+            <Text style={styles.headerText}>Gültig: {startDate} bis {endDate}</Text>
           </View>
           <View style={styles.itemPoints}>
             <View style={styles.pointsCircle}>
@@ -62,22 +135,21 @@ var Program = React.createClass({
           </View>
         </View>
         <View style={styles.itemContent}>
-          <Text style={styles.contentText}>{programData.address1}</Text>
-          <Text style={styles.contentText}>{programData.address2}</Text>
+          <Text style={styles.contentText}>{programData.address1} {programData.address2}</Text>
           <Text style={styles.contentText}>{programData.zip} {programData.companyCity}</Text>
           <Text style={styles.contentText}>{programData.phone} </Text>
-          <Text></Text>
-          <Text style={styles.contentText}>Gültig: {startDate} bis {endDate}</Text>
-        </View>
-        <View style={styles.itemSubContent}>
+          <View style={styles.itemSubContent}>
           <View style={styles.subContentFrame}>
-            <Text style={styles.subContentHeader}>Bereits zum Einlösen erreicht:  </Text>
+            <Text style={styles.contentText}>Bereits zum Einlösen erreicht:  </Text>
           </View>
           <View style={styles.subContentInfo}>
             {collected}
           </View>
         </View>
-        <View style={styles.itemFillIn}></View>
+        </View>
+        <View style={styles.itemVerification}>
+          {keyInput}
+        </View>
         <View style={styles.itemBtn}>
             {Btn}
           </View>
@@ -94,15 +166,16 @@ var styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#9DC02E',
   },
-  // HEADER 
+  // HEADER ===========================
   itemHeader:{
-    flex: 3,
+    flex: 2.5,
     alignSelf: 'stretch',
     flexDirection: 'row'
   },
   headerFrame: {
     flex: 3,
-    padding: 10
+    padding: 10,
+    justifyContent: 'space-between',
   },
   headerTitle: {
     color: 'white',
@@ -111,7 +184,11 @@ var styles = StyleSheet.create({
   },
   headerSubTitle: {
     color: 'white',
-    fontSize: 18
+    fontSize: 20
+  },
+  headerText: {
+    color: 'white',
+    fontSize: 16
   },
   // HEADER CIRCLE
   itemPoints:{
@@ -136,35 +213,30 @@ var styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold'
   },
-  // Content
+  // CONTENT ===========================
   itemContent: {
-    flex: 3,
+    flex: 2,
     alignSelf: 'stretch',
     flexDirection: 'column',
     padding: 10
   },
   contentText: {
     color: 'white',
-    fontSize: 18
+    fontSize: 16
   },
-  // SubContent
+  // SUBCONTENT ===========================
   itemSubContent: {
-    flex: 2,
     alignSelf: 'stretch',
     flexDirection: 'row'
   },
   subContentFrame: {
-    padding: 10
-  },
-  subContentHeader: {
-    color: 'white',
-    fontSize: 18
+    alignSelf: 'center',
   },
   // SubContentInfo
   subContentInfo:{
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     paddingTop: 2
   },
   infoCircle:{
@@ -180,14 +252,32 @@ var styles = StyleSheet.create({
     fontSize: 12,
     backgroundColor: 'rgba(0,0,0,0)'
   },
-  // Fill-In
-  itemFillIn: {
-    flex: 4,
+  // VERIFICATION ===========================
+  itemVerification: {
+    flex: 5,
     alignSelf: 'stretch',
     backgroundColor: '#01577A',
-    
   },
-  // BTN
+  inputFrame: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  inputText: {
+    padding: 10,
+    fontSize: 16,
+    color: 'white'
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderRadius: 8,
+    margin: 25,
+    paddingLeft: 5
+  },
+  // BTN ===========================
   itemBtn: {
     flex: 3,
     alignSelf: 'stretch',

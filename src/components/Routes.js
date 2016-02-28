@@ -8,7 +8,6 @@ import MyPoints from '../views/MyPoints';
 import Scan from '../views/Scan';
 import Messages from '../views/Messages';
 import ProgramDetail from '../views/ProgramDetail';
-import Redeem from '../views/Redeem';
 import Message from '../views/Message';
 import Profile from '../views/Profile';
 
@@ -58,14 +57,6 @@ export default function (props){
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={true} displBackIcon={true} />
           <ProgramDetail navigator={props.navigator} data={props.route.data} userEmail={props.route.userEmail}/>
-          <BottomBar nav={props.navigator} currentPage={props.route.id} />
-        </View>
-      );
-    case 'Redeem':
-    	return (
-        <View style={{flex: 1}}>
-          <TopBar nav={props.navigator} displProfile={true} displBackIcon={true} />
-          <Redeem navigator={props.navigator} data={props.route.data} userEmail={props.route.userEmail} />
           <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );
