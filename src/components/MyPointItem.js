@@ -19,25 +19,28 @@ var MyPointItem = React.createClass({
 
   render: function() {
     var programData = this.props.programData;
+    var collected = (programData.ProgramsFinished > 0) ? (
+      <View style={styles.infoCircle}>
+        <Text style={styles.infoText}>{programData.ProgramsFinished}</Text>
+      </View>
+      ) : (<Text></Text>);
     return (
       <TouchableHighlight onPress={() => this.props.onClick(this.props.rowID)}  underlayColor='#dddddd'>
         <View style={styles.itemContainer}>
 
           <View style={styles.itemInfo}>
-            <View style={styles.infoCircle}>
-              <Text style={styles.infoText}>{programData.myCount}/{programData.programGoal}</Text>
-            </View>
+            {collected}
           </View>
           <View style={styles.itemContent} >
-            <Text style={styles.itemHeader}>{programData.programCompany}</Text>
-            <Text style={styles.itemTitle}>{programData.ProgramsFinished}</Text>
-            <Text style={styles.itemTitle}>{programData.programName}</Text>
+            <Text style={styles.contentHeader}>{programData.programCompany}</Text>
+            <Text style={styles.contentTitle}>{programData.programName}</Text>
+            <Text style={styles.contentAddress}>{programData.address1}, {programData.city}</Text>
           </View>
-
-          <View style={styles.itemNav}>
-            <Text>></Text>
+          <View style={styles.itemPoints}>
+            <View style={styles.pointsCircle}>
+              <Text style={styles.pointsText}>{programData.myCount}/{programData.programGoal}</Text>
+            </View>
           </View>
-
         </View>
       </TouchableHighlight>
     );
@@ -54,16 +57,13 @@ var styles = StyleSheet.create({
     borderBottomColor: 'white',
     borderBottomWidth: 1
   },
-  itemContent: {
-    flex: 19,
-    flexDirection: 'column',
-    justifyContent: 'space-around'
-  },
+  // Already successful collected Points
   itemInfo:{
-    flex: 2,
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    alignItems: 'center'
+    alignItems: 'flex-start',
+    paddingTop: 10
   },
   infoCircle:{
     justifyContent: 'center',
@@ -77,20 +77,50 @@ var styles = StyleSheet.create({
   infoText:{
     textAlign: 'center',
     color: 'white',
+    fontSize: 12,
     backgroundColor: 'rgba(0,0,0,0)'
   },
-  itemHeader: {
-
+  // Content
+  itemContent: {
+    flex: 5,
+    flexDirection: 'column',
+    justifyContent: 'space-around'
   },
-  itemTitle: {
-
+  contentHeader: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold'
   },
-  itemNav: {
-    flex: 1,
-    justifyContent: 'center'
+  contentTitle: {
+    color: 'white',
+    fontSize: 18
   },
-  separator: {
-    
+  contentAddress: {
+    color: 'white',
+    fontSize: 14
+  },
+  // Information about current QPoint Status
+  itemPoints:{
+    flex: 2,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center'
+  },
+  pointsCircle:{
+    justifyContent: 'center',
+    backgroundColor: '#9BDA70',
+    borderColor: 'white',
+    borderWidth: 1,
+    height: 80,
+    width: 80,
+    borderRadius: 40
+  },
+  pointsText:{
+    textAlign: 'center',
+    color: 'white',
+    backgroundColor: 'rgba(0,0,0,0)',
+    fontSize: 20,
+    fontWeight: 'bold'
   },
 });
 
