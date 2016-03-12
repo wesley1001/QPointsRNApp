@@ -1,5 +1,5 @@
 const serverHost = 'localhost';
-// const serverHost = '172.20.10.2';
+// const serverHost = '192.168.2.104';
 
 export function CheckCode(userEmail, code) {
 	let source = 'http://' + serverHost + ':3000/api/v1/codecheck';
@@ -12,12 +12,26 @@ export function CheckCode(userEmail, code) {
 	});
 }
 
-export function getUserData(userEmail, userPW) {
-	let source = 'http://' + serverHost + ':3000/api/v1/checkuser';
+export function loginUser(userEmail, userPW) {
+	let source = 'http://' + serverHost + ':3000/api/v2/login'; // v1/checkuser
 	return fetch(source, {
 		method: 'POST',
 		headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-		body: JSON.stringify({ userEmail: userEmail, password: userPW })
+		body: JSON.stringify({ username: userEmail, password: userPW })
+	}).then((response) => {
+		return response.json();
+	});
+}
+
+export function getUserData(token) {
+	let source = 'http://' + serverHost + ':3000/api/v2/user';
+	return fetch(source, {
+		method: 'GET',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json',
+			'Authorization': 'Bearer ' + token
+		}
 	}).then((response) => {
 		return response.json();
 	});

@@ -3,7 +3,8 @@
 
 import React  from 'react-native';
 import Storage from 'react-native-store';
-import {getUserData} from '../components/ApiUtils';
+import {loginUser, getUserData} from '../components/ApiUtils';
+import {initStorage} from '../components/initStorage';
 
 var {
   AsyncStorage,
@@ -14,21 +15,12 @@ var {
   View
 } = React;
 
-const DB = { 'user': Storage.model('user') };
+const DB = {
+  'user': Storage.model('user'),
+  'userData': Storage.model('userData')
+ };
 
-DB.user.find().then((response) => {
-  if (!response) {
-    DB.user.add({
-      userEmail: 'kim.sora@web.de',
-      userPW: '1234',
-      userGender: 1,
-      loggedIn: false,
-      userPoints: '',
-      userMessages: []
-    });
-  }
-  // console.log(response);
-});
+initStorage();
 
 var Login = React.createClass({
 
@@ -36,6 +28,7 @@ var Login = React.createClass({
     return {
       userEmail: '',
       userPW: '',
+      userToken: '',
       loggedIn: false,
       error: false
     };
@@ -49,7 +42,14 @@ var Login = React.createClass({
         return;
       }
       if (!user.loggedIn){
-        this.setState({ loggedIn: false });
+        this.setState({
+          userEmail: user.userEmail,
+          oldUser: user.userEmail,
+          userPW:user.userPW,
+          userRole: user.userRole,
+          userToken: user.userToken,
+          loggedIn: false
+        });
         return;
       }
       this.setState({ loggedIn: true });
@@ -81,24 +81,57 @@ var Login = React.createClass({
         error: '',
         loggedIn: true
       });
+      console.log('dies wird gespeichert');
+      console.log(res.programData);
       let userProgramData = res.programData ? res.programData : '';
       let recordDate = Date.parse(new Date());
-      DB.user.updateById({
-        userEmail: this.state.userEmail,
-        userPW: this.state.userPW,
+      DB.userData.updateById({
         userGender: res.gender,
-        loggedIn: true,
         userPoints: userProgramData,
         userMessages: [],
         lastSync: recordDate
-      },1).then(() => this.props.navigator.replace({id: 'MyPoints'}));
+      },1)
+        .then(() => this.props.navigator.replace({id: 'MyPoints'}))
+        .catch((err) => console.log(`SOMETHING WRONG: ${err}`));
     }
   },
 
+  _saveToken(token, role){
+    let gender = this.state.gender;
+    if (this.state.userEmail === this.state.oldUser) {
+      gender = this.state.userGender;
+    }
+    DB.user.updateById({
+      userEmail: this.state.userEmail,
+      userPW: this.state.userPW,
+      userRole: role,
+      userToken: token,
+      loggedIn: true
+    },1)
+  },
+
   _onPressLogin(){
-    getUserData(this.state.userEmail, this.state.userPW)
+    loginUser(this.state.userEmail, this.state.userPW)
       .then((response) => {
-        this._handleResponse(response);
+        if(response.success === true) {
+          console.log('API reports success');
+          this.setState({
+            userToken: response.token,
+            userRole: response.role 
+          });
+          this._saveToken(response.token, response.role);
+          getUserData(response.token)
+            .then((respData) => {
+              console.log('This is how data returned');
+              console.log(respData);
+              this._handleResponse(respData);
+            })
+            .catch((err) => console.log(`Did not receive userData: ${err}`));
+          return;
+        } else {
+          console.log('API reports problem');
+          console.log(response);
+        }
       })
       .catch((err) => console.log(`There was an error: ${err}`));
   },

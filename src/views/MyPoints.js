@@ -13,7 +13,10 @@ var {
   View
 } = React;
 
-const DB = { 'user': Storage.model('user') };
+const DB = {
+  'user': Storage.model('user'),
+  'userData': Storage.model('userData')
+ };
 
 var MyPoints = React.createClass({
   
@@ -21,8 +24,7 @@ var MyPoints = React.createClass({
     var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
       return {
         dataSource: ds.cloneWithRows([]),
-        userEmail: '',
-        userPW: '',
+        userToken: '',
         userMessages: '',
         lastSync: ''
     };
@@ -30,32 +32,31 @@ var MyPoints = React.createClass({
 
   componentWillMount() {
     DB.user.findById(1).then((resp) => {
-      if (resp) {
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(resp.userPoints),
-          userEmail: resp.userEmail,
-          userPW: resp.userPW,
-          userMessages: resp.userMessages,
-          lastSync: resp.lastSync
-        });
-        console.log('secondes since last update ' + (Date.parse(new Date()) - resp.lastSync)/1000);
-        if ((Date.parse(new Date()) - resp.lastSync)/1000 > 60) {
-          this.refreshData();
-        }
-      }
+      this.setState({ userToken: resp.userToken });
     });
+    DB.userData.findById(1)
+      .then((resp) => {
+        if (resp) {
+          this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(resp.userPoints),
+            userMessages: resp.userMessages,
+            lastSync: resp.lastSync
+          });
+          console.log('secondes since last update ' + (Date.parse(new Date()) - resp.lastSync)/1000);
+          if ((Date.parse(new Date()) - resp.lastSync)/1000 > 60) {
+            this.refreshData();
+          }
+        } else {console.log('WARUM NICHT?');}
+      });
   },
 
   refreshData() {
     console.log('now lets call API');
-    getUserData(this.state.userEmail, this.state.userPW)
+    getUserData(this.state.userToken)
       .then((response) => {
         if (response.success===true){
-          DB.user.updateById({
-            userEmail: this.state.userEmail,
-            userPW: this.state.userPW,
+          DB.userData.updateById({
             userGender: response.gender,
-            loggedIn: true,
             userPoints: response.programData,
             userMessages: this.state.userMessages,
             lastSync: Date.parse(new Date())
