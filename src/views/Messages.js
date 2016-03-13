@@ -86,7 +86,9 @@ var Messages = React.createClass({
 var styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#9DC02E',
+    backgroundColor: '#01577A',
+    borderBottomColor: 'white',
+    borderBottomWidth: 1,
   },
 });
 
