@@ -38,9 +38,9 @@ export function getUserData(token) {
 }
 
 export function createAccount(userEmail, pw) {
-	let source = 'http://' + serverHost + ':3000/api/v1/createaccount';
+	let source = 'http://' + serverHost + ':3000/api/v2/user';
 	return fetch(source, {
-		method: 'POST',
+		method: 'PUT',
 		headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
 		body: JSON.stringify({ userEmail: userEmail, password: pw })
 	}).then((response) => {

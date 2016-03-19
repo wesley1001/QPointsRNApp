@@ -6,6 +6,7 @@ import Storage from 'react-native-store';
 import {updateProfile, loginUser} from '../components/ApiUtils';
 
 var {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
@@ -21,12 +22,16 @@ var Profile = React.createClass({
   getInitialState(){
     return {
       userEmail: '',
-      userGender: '',
       userRole: '',
       currentPW: '',
+      errorPW: false,
       userPW: '',
       userPW2: '',
-      userToken: ''
+      userToken: '',
+      userGender: '',
+      userPoints: '',
+      userMessages: [],
+      lastSync: ''
     };
   },
 
@@ -39,11 +44,14 @@ var Profile = React.createClass({
         userRole: resp.userRole,
         userToken: resp.userToken
       });
-      console.log(resp);
     });
     DB.userData.findById(1).then((resp) => {
-      this.setState({ userGender: resp.userGender });
-      console.log(resp);
+      this.setState({
+        userGender: resp.userGender,
+        userPoints: resp.userPoints,
+        userMessages: resp.userMessages,
+        lastSync: resp.lastSync
+      });
     });
   },
 
@@ -69,10 +77,33 @@ var Profile = React.createClass({
     });
   },
 
+  _storeAndExit(response){
+    var PW = this.state.userPW !== '' ? this.state.userPW : this.state.currentPW;
+    DB.user.updateById({
+      userEmail: this.state.userEmail,
+      userPW: PW,
+      userRole: this.state.userRole,
+      userToken: this.state.userToken,
+      loggedIn: true
+    },1);
+    DB.userData.updateById({
+      userGender: this.state.gender,
+      userPoints: this.state.userPoints,
+      userMessages: this.state.userMessages,
+      lastSync: this.state.lastSync
+    },1).then(() => {
+      Alert.alert('Hinweis', 'Profil wurde aktualisiert',
+        [{text: 'OK', onPress: () => { this.props.navigator.pop()}}]
+      );
+    });
+  },
+
   _onPressUpdate(){
     if (this.state.userPW2===this.state.userPW){
       updateProfile(this.state.gender, this.state.userPW, this.state.userToken)
-        .then((resp) => {console.log('update war erfolgreich')})
+        .then((resp) => {
+          this._storeAndExit(resp)
+        })
         .catch((err) => {
           console.log(err);
           if (err.message === 'Authorization has expired') {

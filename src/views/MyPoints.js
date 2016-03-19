@@ -37,6 +37,7 @@ var MyPoints = React.createClass({
     DB.userData.findById(1)
       .then((resp) => {
         if (resp) {
+          console.log(resp);
           this.setState({
             dataSource: this.state.dataSource.cloneWithRows(resp.userPoints),
             userMessages: resp.userMessages,

@@ -51,7 +51,7 @@ var Register = React.createClass({
       this.setState({
         errorMessge: res.message,
       });
-    Alert.alert('Sie können nicht angemdeldet werden', this.state.errorMessge)
+    Alert.alert('Sie können nicht angemeldet werden', this.state.errorMessge)
     } else {
       this.props.navigator.pop();
     }
