@@ -122,8 +122,6 @@ var Login = React.createClass({
           this._saveToken(response.token, response.role);
           getUserData(response.token)
             .then((respData) => {
-              console.log('This is how data returned');
-              console.log(respData);
               this._handleResponse(respData);
             })
             .catch((err) => console.log(`Did not receive userData: ${err}`));

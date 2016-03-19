@@ -59,14 +59,19 @@ export function getMessages(userEmail, pw) {
 	});
 }
 
-export function updateProfile(userEmail, currentPW, gender, newPW) {
-	let source = 'http://' + serverHost + ':3000/api/v1/updateuser';
+export function updateProfile(gender, newPW, token) {
+	let source = 'http://' + serverHost + ':3000/api/v2/user';
 	return fetch(source, {
 		method: 'POST',
-		headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-		body: JSON.stringify({ userEmail: userEmail, passwordOld: currentPW, gender: gender, passwordNew: newPW })
+		headers: { 'Accept': '*/*', 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+		body: JSON.stringify({ gender: gender, passwordNew: newPW })
 	}).then((response) => {
-		return response.json();
+			let json = response.json();
+		  if (response.status >= 200 && response.status < 300) {
+		    return json;
+		  } else {
+		    return json.then(Promise.reject.bind(Promise));
+		  }  
 	});
 }
 
