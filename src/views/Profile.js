@@ -3,9 +3,10 @@
 
 import React from 'react-native';
 import Storage from 'react-native-store';
-import {updateProfile} from '../components/ApiUtils';
+import {updateProfile, loginUser} from '../components/ApiUtils';
 
 var {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
@@ -13,18 +14,24 @@ var {
   View
 } = React;
 
-const DB = { 'user': Storage.model('user') };
+const DB = {  'user': Storage.model('user'),
+              'userData': Storage.model('userData') };
 
 var Profile = React.createClass({
 
   getInitialState(){
     return {
       userEmail: '',
-      userGender: '',
+      userRole: '',
+      currentPW: '',
       errorPW: false,
       userPW: '',
       userPW2: '',
-      currentPW: ''
+      userToken: '',
+      userGender: '',
+      userPoints: '',
+      userMessages: [],
+      lastSync: ''
     };
   },
 
@@ -33,10 +40,18 @@ var Profile = React.createClass({
       console.log('Storage is');
       this.setState({
         userEmail: resp.userEmail,
-        userGender: resp.userGender,
-        currentPW: resp.userPW
+        currentPW: resp.userPW,
+        userRole: resp.userRole,
+        userToken: resp.userToken
       });
-      console.log(resp);
+    });
+    DB.userData.findById(1).then((resp) => {
+      this.setState({
+        userGender: resp.userGender,
+        userPoints: resp.userPoints,
+        userMessages: resp.userMessages,
+        lastSync: resp.lastSync
+      });
     });
   },
 
@@ -62,10 +77,52 @@ var Profile = React.createClass({
     });
   },
 
+  _storeAndExit(response){
+    var PW = this.state.userPW !== '' ? this.state.userPW : this.state.currentPW;
+    DB.user.updateById({
+      userEmail: this.state.userEmail,
+      userPW: PW,
+      userRole: this.state.userRole,
+      userToken: this.state.userToken,
+      loggedIn: true
+    },1);
+    DB.userData.updateById({
+      userGender: this.state.gender,
+      userPoints: this.state.userPoints,
+      userMessages: this.state.userMessages,
+      lastSync: this.state.lastSync
+    },1).then(() => {
+      Alert.alert('Hinweis', 'Profil wurde aktualisiert',
+        [{text: 'OK', onPress: () => { this.props.navigator.pop()}}]
+      );
+    });
+  },
+
   _onPressUpdate(){
-    console.log(this.state.userPW2, this.state.userPW);
     if (this.state.userPW2===this.state.userPW){
-      updateProfile(this.state.userEmail, this.state.currentPW, this.state.gender, this.state.userPW)
+      updateProfile(this.state.gender, this.state.userPW, this.state.userToken)
+        .then((resp) => {
+          this._storeAndExit(resp)
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err.message === 'Authorization has expired') {
+            loginUser(this.state.userEmail, this.state.currentPW)
+              .then((response) => {
+                if(response.success === true) {
+                  this.setState({
+                    userToken: response.token
+                  });
+                  console.log('versuchen wir es nochmals...');
+                  this._onPressUpdate();
+                } else {
+                  console.log('API reports no new token');
+                  console.log(response);
+                }
+              })
+              .catch((err) => console.log(`There was an error: ${err}`));
+          }
+        })
     } else {
       this.setState({
         errorPW: true
@@ -93,6 +150,10 @@ var Profile = React.createClass({
         <View style={[styles.textField, styles.bgBlue]}>
           <Text style={styles.textInField}>{this.state.userEmail}</Text>
         </View>
+        <Text>Rolle:</Text>
+        <View style={[styles.textField, styles.bgBlue]}>
+          <Text style={styles.textInField}>{this.state.userRole}</Text>
+        </View>
         <Text>Geschlecht:</Text>
         <View style={[styles.textField, styles.bgBlue]}>
           <Text style={styles.textInField}>{gender}</Text>
@@ -100,12 +161,14 @@ var Profile = React.createClass({
         <TextInput
           style={[styles.textField, styles.bgGrey, styles.textInField]}
           keyboardType='default'
+          secureTextEntry={true}
           placeholder='Passwort ändern'
           placeholderTextColor= '#01577A'
           onChangeText={(text) => this._handlePWInput(text)} />
         <TextInput
           style={[styles.textField, styles.bgGrey, styles.textInField]}
           keyboardType='default'
+          secureTextEntry={true}
           placeholder= {placeholderPW2}
           placeholderTextColor= '#01577A'
           onChangeText={(text) => this._handlePWInput2(text)}
