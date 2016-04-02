@@ -56,7 +56,7 @@ export default function (props){
     	return (
         <View style={{flex: 1}}>
           <TopBar nav={props.navigator} displProfile={true} displBackIcon={true} />
-          <ProgramDetail navigator={props.navigator} data={props.route.data} userEmail={props.route.userEmail}/>
+          <ProgramDetail navigator={props.navigator} data={props.route.data} userToken={props.route.userToken} />
           <BottomBar nav={props.navigator} currentPage={props.route.id} />
         </View>
       );

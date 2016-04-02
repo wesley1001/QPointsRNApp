@@ -75,12 +75,12 @@ export function updateProfile(gender, newPW, token) {
 	});
 }
 
-export function redeemPoint(userEmail, programNr, programGoal) {
-	let source = 'http://' + serverHost + ':3000/api/v1/coderedeem';
+export function redeemPoint(programNr, programGoal, token) {
+	let source = 'http://' + serverHost + ':3000/api/v2/redeem';
 	return fetch(source, {
 		method: 'POST',
-		headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-		body: JSON.stringify({ userEmail: userEmail, programNr: programNr, programGoal: programGoal })
+		headers: { 'Accept': '*/*', 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+		body: JSON.stringify({ programNr: programNr, programGoal: programGoal })
 	}).then((response) => {
 		return response.json();
 	});
