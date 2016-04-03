@@ -19,9 +19,10 @@ var MyPointItem = React.createClass({
 
   render: function() {
     var programData = this.props.programData;
-    var collected = (programData.ProgramsFinished > 0) ? (
+    console.log(programData);
+    var collected = (programData.programsFinished > 0) ? (
       <View style={styles.infoCircle}>
-        <Text style={styles.infoText}>{programData.ProgramsFinished}</Text>
+        <Text style={styles.infoText}>{programData.programsFinished}</Text>
       </View>
       ) : (<Text></Text>);
     return (

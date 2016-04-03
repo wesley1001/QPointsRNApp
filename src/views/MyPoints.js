@@ -26,7 +26,8 @@ var MyPoints = React.createClass({
         dataSource: ds.cloneWithRows([]),
         userToken: '',
         userMessages: '',
-        lastSync: ''
+        lastSync: '',
+        reloading: false
     };
   },
 
@@ -53,6 +54,7 @@ var MyPoints = React.createClass({
 
   refreshData() {
     console.log('now lets call API');
+    this.setState({ reloading: true });
     getUserData(this.state.userToken)
       .then((response) => {
         if (response.success===true){
@@ -64,6 +66,7 @@ var MyPoints = React.createClass({
           },1).then(() => {
             this.setState({
               dataSource: this.state.dataSource.cloneWithRows(response.programData), 
+              reloading: false
             });
           });
         }
@@ -84,8 +87,24 @@ var MyPoints = React.createClass({
     this.props.navigator.push({
       id: 'ProgramDetail',
       data: this.state.dataSource._dataBlob.s1[rowID],
-      userEmail: this.state.userEmail
+      userToken: this.state.userToken
     });
+  },
+
+  _handleScroll(e) {
+    if (e.nativeEvent.contentOffset.y < -45) {
+      console.log(('Seconds since last update ' + ((Date.parse(new Date()) - this.state.lastSync))/1000));
+      if ( this.state.reloading === true || (((Date.parse(new Date()) - this.state.lastSync))/1000 < 20) ) {
+        return;
+      } else {
+        this.setState({
+          reloading: true,
+          lastSync: Date.parse(new Date())
+        });
+        this.refreshData();
+        console.log('scrolling...');
+      }
+    }
   },
 
   render: function() {
@@ -93,6 +112,7 @@ var MyPoints = React.createClass({
       <View style={styles.container}>
         <ListView
           dataSource={this.state.dataSource}
+          onScroll={this._handleScroll}
           renderRow={this._renderRow}
           />
       </View>

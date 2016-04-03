@@ -14,7 +14,7 @@ var {
   View
 } = React;
 
-const DB = { 'user': Storage.model('user') };
+const DB = { 'userData': Storage.model('userData') };
 
 var Program = React.createClass({
 
@@ -27,8 +27,9 @@ var Program = React.createClass({
   },
 
   componentWillMount() {
-    DB.user.findById(1)
+    DB.userData.findById(1)
       .then((storedUserData) => {
+        console.log(storedUserData);
         this.setState({
           userPoints: storedUserData.userPoints
         });
@@ -42,17 +43,20 @@ var Program = React.createClass({
   },
 
   _onPressKeyVerification(){
-    redeemPoint(this.props.userEmail, this.props.data.programNr, this.props.data.programGoal)
+    redeemPoint( this.props.data.programNr, this.props.data.programGoal, this.props.userToken)
       .then((response) => {
+        console.log(response);
         var programNr = this.props.data.programNr;
         if (response.success===true){
-          this.props.data.ProgramsFinished -= 1;
+          this.props.data.programsFinished -= 1;
           var userPoints = this.state.userPoints;
+          console.log('das sind die userPoints');
+          console.log(userPoints);
           var foundIndex = userPoints.findIndex(function(item) {
             return (item.programNr === programNr);
           });
-          userPoints[foundIndex].ProgramsFinished -= 1;
-          DB.user.updateById({
+          userPoints[foundIndex].programsFinished -= 1;
+          DB.userData.updateById({
             userPoints: userPoints
           },1).then(() => {
             this.setState({
@@ -64,7 +68,7 @@ var Program = React.createClass({
             'QPoint could not be redeemed',
             response.message,
             [
-              {text: 'OK', onPress: () => {
+              {text: 'Warnung', onPress: () => {
                 this.setState({
                   redeemStatus: false 
                 });
@@ -86,7 +90,7 @@ var Program = React.createClass({
     var programData = this.props.data;
     console.log('I am in ProgramDetail');
     console.log(programData);
-    var Btn = (programData.ProgramsFinished != 0 && this.state.redeemStatus=== false )? (
+    var Btn = (programData.programsFinished != 0 && this.state.redeemStatus=== false )? (
       <TouchableHighlight
         style={styles.button}
         onPress ={() => this._onPressRedeem()} >
@@ -99,9 +103,9 @@ var Program = React.createClass({
         <Text style={styles.buttonText} >Verifizieren & Einlösen</Text>
       </TouchableHighlight>
       ) : (<Text/>);
-    var collected = (programData.ProgramsFinished > 0) ? (
+    var collected = (programData.programsFinished > 0) ? (
       <View style={styles.infoCircle}>
-        <Text style={styles.infoText}>{programData.ProgramsFinished}</Text>
+        <Text style={styles.infoText}>{programData.programsFinished}</Text>
       </View>
       ) : (<View style={styles.subContentFrame}><Text style={styles.contentText}>0</Text></View>);
     var keyInput = (this.state.redeemStatus===true) ? (
@@ -140,7 +144,7 @@ var Program = React.createClass({
           <Text style={styles.contentText}>{programData.phone} </Text>
           <View style={styles.itemSubContent}>
           <View style={styles.subContentFrame}>
-            <Text style={styles.contentText}>Bereits zum Einlösen erreicht:  </Text>
+            <Text style={styles.contentText}>Bereits zum Einlösen erreicht: </Text>
           </View>
           <View style={styles.subContentInfo}>
             {collected}
