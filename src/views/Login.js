@@ -5,6 +5,7 @@ import React  from 'react-native';
 import Storage from 'react-native-store';
 import {loginUser, getUserData} from '../components/ApiUtils';
 import {initStorage} from '../components/initStorage';
+import {isOk} from '../components/IsConnected';
 
 var {
   AsyncStorage,
@@ -27,10 +28,14 @@ var Login = React.createClass({
   getInitialState: function() {
     return {
       userEmail: '',
+      oldUser: '',
       userPW: '',
+      oldPW: '',
       userToken: '',
       loggedIn: false,
-      error: false
+      error: false,
+      isConnected: null,
+      lastSavedMessages: ''
     };
   },
 
@@ -45,10 +50,16 @@ var Login = React.createClass({
         this.setState({
           userEmail: user.userEmail,
           oldUser: user.userEmail,
-          userPW:user.userPW,
+          userPW: user.userPW,
+          oldPW: user.userPW,
           userRole: user.userRole,
           userToken: user.userToken,
           loggedIn: false
+        });
+        DB.userData.findById(1).then((response) => {
+          if (response.userMessages.length > 0){
+            this.setState({ lastSavedMessages: response.userMessages });
+          }
         });
         return;
       }
@@ -81,14 +92,12 @@ var Login = React.createClass({
         error: '',
         loggedIn: true
       });
-      console.log('dies wird gespeichert');
-      console.log(res.programData);
       let userProgramData = res.programData ? res.programData : '';
       let recordDate = Date.parse(new Date());
       DB.userData.updateById({
         userGender: res.gender,
         userPoints: userProgramData,
-        userMessages: [],
+        userMessages: this.state.lastSavedMessages,
         lastSync: recordDate
       },1)
         .then(() => this.props.navigator.replace({id: 'MyPoints'}))
@@ -111,27 +120,36 @@ var Login = React.createClass({
   },
 
   _onPressLogin(){
-    loginUser(this.state.userEmail, this.state.userPW)
-      .then((response) => {
-        if(response.success === true) {
-          console.log('API reports success');
-          this.setState({
-            userToken: response.token,
-            userRole: response.role 
-          });
-          this._saveToken(response.token, response.role);
-          getUserData(response.token)
-            .then((respData) => {
-              this._handleResponse(respData);
-            })
-            .catch((err) => console.log(`Did not receive userData: ${err}`));
-          return;
-        } else {
-          console.log('API reports problem');
-          console.log(response);
-        }
-      })
-      .catch((err) => console.log(`There was an error: ${err}`));
+    if(isOk()){
+      if (this.state.userEmail !== this.state.oldUser) {
+        this.setState({ lastSavedMessages: '' });
+      }
+      loginUser(this.state.userEmail, this.state.userPW)
+        .then((response) => {
+          if(response.success === true) {
+            this.setState({
+              userToken: response.token,
+              userRole: response.role 
+            });
+            this._saveToken(response.token, response.role);
+            getUserData(response.token)
+              .then((respData) => {
+                this._handleResponse(respData);
+              })
+              .catch((err) => console.log(`Did not receive userData: ${err}`));
+            return;
+          } else {
+          }
+        })
+        .catch((err) => console.log(`There was an error: ${err}`));
+    } else {
+      console.log('No internet connection to login');
+      if (this.state.userEmail === this.state.oldUser && this.state.userPW === this.state.oldPW){
+        this.setState({ loggedIn: true });
+        this.props.navigator.replace({id: 'MyPoints'});
+      }
+    }
+    
   },
 
   _onPressSignin(){
@@ -172,6 +190,7 @@ var Login = React.createClass({
       </View>
     );
   }
+
 });
 
 var styles = StyleSheet.create({

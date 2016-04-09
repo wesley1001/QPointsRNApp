@@ -1,12 +1,12 @@
 const serverHost = 'localhost';
 // const serverHost = '192.168.2.104';
 
-export function CheckCode(userEmail, code) {
-	let source = 'http://' + serverHost + ':3000/api/v1/codecheck';
+export function CheckCode(code, token) {
+	let source = 'http://' + serverHost + ':3000/api/v2/code';
 	return fetch(source, {
 		method: 'POST',
-		headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-		body: JSON.stringify({ qpInput: code, userEmail: userEmail })
+		headers: { 'Accept': '*/*', 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+		body: JSON.stringify({ scannedCode: code })
 	}).then((response) => {
 		return response.json();
 	});
@@ -48,12 +48,15 @@ export function createAccount(userEmail, pw) {
 	});
 }
 
-export function getMessages(userEmail, pw) {
-	let source = 'http://' + serverHost + ':3000/api/v1/newsfeed';
+export function getMessages(token) {
+	let source = 'http://' + serverHost + ':3000/api/v2/news';
 	return fetch(source, {
-		method: 'POST',
-		headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-		body: JSON.stringify({ userEmail: userEmail, password: pw })
+		method: 'GET',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json',
+			'Authorization': 'Bearer ' + token
+		}
 	}).then((response) => {
 		return response.json();
 	});

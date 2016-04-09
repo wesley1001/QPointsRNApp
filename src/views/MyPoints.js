@@ -5,6 +5,7 @@ import React from 'react-native';
 import MyPointItem from '../components/MyPointItem';
 import Storage from 'react-native-store';
 import {getUserData} from '../components/ApiUtils';
+import {isOk} from '../components/IsConnected';
 
 var {
   ListView,
@@ -38,7 +39,6 @@ var MyPoints = React.createClass({
     DB.userData.findById(1)
       .then((resp) => {
         if (resp) {
-          console.log(resp);
           this.setState({
             dataSource: this.state.dataSource.cloneWithRows(resp.userPoints),
             userMessages: resp.userMessages,
@@ -53,25 +53,28 @@ var MyPoints = React.createClass({
   },
 
   refreshData() {
-    console.log('now lets call API');
-    this.setState({ reloading: true });
-    getUserData(this.state.userToken)
-      .then((response) => {
-        if (response.success===true){
-          DB.userData.updateById({
-            userGender: response.gender,
-            userPoints: response.programData,
-            userMessages: this.state.userMessages,
-            lastSync: Date.parse(new Date())
-          },1).then(() => {
-            this.setState({
-              dataSource: this.state.dataSource.cloneWithRows(response.programData), 
-              reloading: false
-            });
-          });
-        }
-      })
-      .catch((err) => console.log(`There was an error: ${err}`));
+    if (isOk()){
+      this.setState({ reloading: true });
+        getUserData(this.state.userToken)
+          .then((response) => {
+            if (response.success===true){
+              DB.userData.updateById({
+                userGender: response.gender,
+                userPoints: response.programData,
+                userMessages: this.state.userMessages,
+                lastSync: Date.parse(new Date())
+              },1).then(() => {
+                this.setState({
+                  dataSource: this.state.dataSource.cloneWithRows(response.programData), 
+                  reloading: false
+                });
+              });
+            }
+          })
+          .catch((err) => console.log(`There was an error: ${err}`));
+    } else {
+      console.log('no Internet connection');
+    }
   },
 
   _renderRow: function(rowData, sectionID, rowID) {

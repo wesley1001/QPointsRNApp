@@ -37,7 +37,6 @@ var Profile = React.createClass({
 
   componentWillMount(){
     DB.user.findById(1).then((resp) => {
-      console.log('Storage is');
       this.setState({
         userEmail: resp.userEmail,
         currentPW: resp.userPW,
@@ -72,8 +71,9 @@ var Profile = React.createClass({
     DB.user.updateById({
       loggedIn: false 
     },1).then(() => {
-      console.log('userEmail has been logged out');
-      this.props.navigator.replace({id: 'Login'});
+      DB.userData.findById(1).then((response) => {
+        this.props.navigator.replace({id: 'Login'});
+      });
     });
   },
 

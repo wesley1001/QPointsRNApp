@@ -45,13 +45,10 @@ var Program = React.createClass({
   _onPressKeyVerification(){
     redeemPoint( this.props.data.programNr, this.props.data.programGoal, this.props.userToken)
       .then((response) => {
-        console.log(response);
         var programNr = this.props.data.programNr;
         if (response.success===true){
           this.props.data.programsFinished -= 1;
           var userPoints = this.state.userPoints;
-          console.log('das sind die userPoints');
-          console.log(userPoints);
           var foundIndex = userPoints.findIndex(function(item) {
             return (item.programNr === programNr);
           });
@@ -90,7 +87,7 @@ var Program = React.createClass({
     var programData = this.props.data;
     console.log('I am in ProgramDetail');
     console.log(programData);
-    var Btn = (programData.programsFinished != 0 && this.state.redeemStatus=== false )? (
+    var Btn = (programData.programsFinished != 0 && this.state.redeemStatus=== false ) ? (
       <TouchableHighlight
         style={styles.button}
         onPress ={() => this._onPressRedeem()} >
@@ -108,7 +105,7 @@ var Program = React.createClass({
         <Text style={styles.infoText}>{programData.programsFinished}</Text>
       </View>
       ) : (<View style={styles.subContentFrame}><Text style={styles.contentText}>0</Text></View>);
-    var keyInput = (this.state.redeemStatus===true) ? (
+    var keyInput = (this.state.redeemStatus===false) ? (
       <View style={styles.inputFrame}>
         <Text style={styles.inputText}>Bitten Sie den Ladeninhaber um den Einlöse-Schlüssel und geben Sie diesen hier ein</Text>
         <TextInput

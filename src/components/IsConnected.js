@@ -1,0 +1,25 @@
+'use strict';
+
+import React from 'react-native';
+
+var { NetInfo } = React;
+
+module.exports = (function () {
+
+	var status = { isConnected: true };
+
+	NetInfo.isConnected.fetch().done(function (isConnected) {
+		status.isConnected = isConnected;
+	});
+
+	NetInfo.isConnected.addEventListener('change', function (isConnected) {
+		status.isConnected = isConnected;
+	});
+
+	return {
+		isOk: function () {
+			return status.isConnected
+		}
+	};
+
+}());

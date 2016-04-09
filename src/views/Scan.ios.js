@@ -13,7 +13,10 @@ var {
   View
 } = React;
 
-const DB = { 'user': Storage.model('user') };
+const DB = {
+  'user': Storage.model('user'),
+  'userData': Storage.model('userData')
+};
 
 var Scan = React.createClass({
 
@@ -21,16 +24,18 @@ var Scan = React.createClass({
     return {
       showCamera: true,
       cameraType: Camera.constants.Type.back,
-      userEmail: '',
+      userToken: '',
       userPoints: ''
     }
   },
 
   componentWillMount() {
-    DB.user.findById(1)
+    DB.user.findById(1).then((resp) => {
+      this.setState({ userToken: resp.userToken });
+    });
+    DB.userData.findById(1)
       .then((storedUserData) => {
         this.setState({
-          userEmail: storedUserData.userEmail,
           userPoints: storedUserData.userPoints
         });
       });
@@ -61,7 +66,7 @@ var Scan = React.createClass({
 
   _onBarCodeRead: function(e) {
     this.setState({showCamera: false});
-    CheckCode(this.state.userEmail, e.data).then((response) => {
+    CheckCode(e.data, this.state.userToken).then((response) => {
       var alertTitle;
       if (response.success === false) {
         alertTitle = 'Leider ist der QR-Code nicht gültig';

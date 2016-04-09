@@ -5,6 +5,7 @@ import React from 'react-native';
 import MessageItem from '../components/MessageItem';
 import {getMessages} from '../components/ApiUtils';
 import Storage from 'react-native-store';
+import {isOk} from '../components/IsConnected';
 
 var {
   ListView,
@@ -13,14 +14,18 @@ var {
   View
 } = React;
 
-const DB = { 'user': Storage.model('user') };
+const DB = {
+  'user': Storage.model('user'),
+  'userData': Storage.model('userData')
+};
 
 var Messages = React.createClass({
 
   getInitialState() {
     var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     return {
-      dataSource: ds.cloneWithRows([])
+      dataSource: ds.cloneWithRows([]),
+      userToken: ''
     };
   },
 
@@ -29,7 +34,10 @@ var Messages = React.createClass({
   },
 
   initUserData() {
-    DB.user.findById(1)
+    DB.user.findById(1).then((resp) => {
+      this.setState({ userToken: resp.userToken });
+    });
+    DB.userData.findById(1)
       .then((storedUserData) => {
         var userMessage = (storedUserData.userMessages.length !=0) ? storedUserData.userMessages : '';
         this.setState({
@@ -42,19 +50,30 @@ var Messages = React.createClass({
       });
   },
 
+  componentWillUnmount() {
+    DB.userData.findById(1)
+      .then((storedUserData) => {
+      });
+  },
+
   updateUserData(storedUserData) {
-    getMessages(storedUserData.userEmail, storedUserData.userPW)
-      .then((response) => {
-        if (response.newsFeed) {
-          storedUserData.userMessages = storedUserData.userMessages.concat(response.newsFeed);
-          DB.user.updateById(storedUserData,1).then((storedUserData) => {
-            this.setState({
-              dataSource: this.state.dataSource.cloneWithRows(storedUserData.userMessages)
+    if (isOk()){
+      getMessages(this.state.userToken)
+        .then((response) => {
+          if (response.newsFeed) {
+            storedUserData.userMessages = (storedUserData.userMessages.length > 0)? 
+              storedUserData.userMessages.concat(response.newsFeed) : response.newsFeed;
+            DB.userData.updateById(storedUserData,1).then((storedUserData) => {
+              this.setState({
+                dataSource: this.state.dataSource.cloneWithRows(storedUserData.userMessages)
+              });
             });
-          });
-        }
-      })
-      .catch((err) => console.log(`There was an error: ${err}`));
+          }
+        })
+        .catch((err) => console.log(`There was an error: ${err}`));
+    } else {
+      console.log('no internet connection in newsFeed');
+    }
   },
 
   _renderRow: function(rowData, sectionID, rowID) {
@@ -68,6 +87,9 @@ var Messages = React.createClass({
 
   _itemPressed: function(rowID) {
     this.props.navigator.push({ id: 'Message', data: this.state.dataSource._dataBlob.s1[rowID] });
+    DB.userData.findById(1).then((response) => {
+
+    });
   },
 
   render: function() {
