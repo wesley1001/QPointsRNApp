@@ -61,38 +61,46 @@ var Program = React.createClass({
   },
 
   _onPressRedeem(){
-    redeemPoint( this.props.data.programNr, this.props.data.programGoal, this.props.userToken)
-      .then((response) => {
-        var programNr = this.props.data.programNr;
-        if (response.success===true){
-          this.props.data.programsFinished -= 1;
-          var userPoints = this.state.userPoints;
-          var foundIndex = userPoints.findIndex(function(item) {
-            return (item.programNr === programNr);
-          });
-          userPoints[foundIndex].programsFinished -= 1;
-          DB.userData.updateById({
-            userPoints: userPoints
-          },1).then(() => {
-            this.setState({
-              redeemStatus: false 
+    if (isOk()){
+      redeemPoint( this.props.data.programNr, this.props.data.programGoal, this.props.userToken)
+        .then((response) => {
+          var programNr = this.props.data.programNr;
+          if (response.success===true){
+            this.props.data.programsFinished -= 1;
+            var userPoints = this.state.userPoints;
+            var foundIndex = userPoints.findIndex(function(item) {
+              return (item.programNr === programNr);
             });
-          });
-        } else {
-          Alert.alert(
-            'QPoint konnte nicht eingelöst werden',
-            response.message,
-            [
-              {text: 'Warnung', onPress: () => {
-                this.setState({
-                  redeemStatus: false 
-                });
-                console.log('Konnte leider nicht eingelöst werden');
-              }},
-            ]
-          );
-        }
-      });
+            userPoints[foundIndex].programsFinished -= 1;
+            DB.userData.updateById({
+              userPoints: userPoints
+            },1).then(() => {
+              this.setState({
+                redeemStatus: false 
+              });
+            });
+          } else {
+            Alert.alert(
+              'QPoint konnte nicht eingelöst werden',
+              response.message,
+              [
+                {text: 'Warnung', onPress: () => {
+                  this.setState({
+                    redeemStatus: false 
+                  });
+                  console.log('Konnte leider nicht eingelöst werden');
+                }},
+              ]
+            );
+          }
+        });
+    } else {
+      console.log('no Internet connection');
+      Alert.alert(
+        'Sie haben keine Internet Verbindung','Bitte versuchen Sie es später erneut',
+        [{text: 'Ok', onPress: () => {}},]
+      );
+    }
   },
 
   _onPressVerfiy(){
