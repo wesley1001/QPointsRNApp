@@ -18,10 +18,11 @@ var MessageItem = React.createClass({
   },
 
   render: function() {
+    console.log('rendering Rows');
     var message = this.props.message;
     var newMessage = (message.readStatus) ? (<Text></Text>) : (
         <View style={styles.infoCircle}>
-          <Text style={styles.infoText}>I</Text>
+          <Text style={styles.infoText}>!</Text>
         </View>
       );
     return (
@@ -69,19 +70,19 @@ var styles = StyleSheet.create({
     backgroundColor: '#01577A',
     borderColor: 'white',
     borderWidth: 1,
-    height: 30,
-    width: 30,
-    borderRadius: 15
+    height: 16,
+    width: 16,
+    borderRadius: 8
   },
   infoText:{
     textAlign: 'center',
     color: 'white',
-    fontSize: 12,
+    fontSize: 8,
     backgroundColor: 'rgba(0,0,0,0)'
   },
   // Content
   itemContent: {
-    flex: 5,
+    flex: 16,
     flexDirection: 'column',
     justifyContent: 'space-around'
   },
