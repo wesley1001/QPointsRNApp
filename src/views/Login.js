@@ -70,7 +70,8 @@ var Login = React.createClass({
 
   _handleUserInput(inputText){
     this.setState({
-      userEmail: inputText
+      userEmail: inputText,
+      error: ''
     })
   },
 
@@ -147,9 +148,12 @@ var Login = React.createClass({
       if (this.state.userEmail === this.state.oldUser && this.state.userPW === this.state.oldPW){
         this.setState({ loggedIn: true });
         this.props.navigator.replace({id: 'MyPoints'});
+      } else {
+        this.setState({
+          error: 'Bitte verbinden Sie Ihr Gerät mit dem Internet' 
+        });
       }
     }
-    
   },
 
   _onPressSignin(){
@@ -161,7 +165,7 @@ var Login = React.createClass({
     if (this.state.error){
       warningText = (<Text style={styles.warningText}>{this.state.error}</Text>);
     } else {
-      warningText = (<Text></Text>);
+      warningText = (<Text style={styles.warningText}></Text>);
     }
     return (
       <View style={styles.container}>
@@ -181,12 +185,12 @@ var Login = React.createClass({
           onPress ={() => this._onPressLogin()} >
           <Text style={styles.buttonText} >Login</Text>
         </TouchableHighlight>
-        {warningText}
         <TouchableHighlight
           style={styles.button}
           onPress ={() => this._onPressSignin()} >
           <Text style={styles.buttonText} >Konto erstellen</Text>
         </TouchableHighlight>
+        {warningText}
       </View>
     );
   }

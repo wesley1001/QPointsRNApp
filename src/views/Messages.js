@@ -39,8 +39,6 @@ var Messages = React.createClass({
   initUserData() {
     this.getUserDataDB()
       .then((storedUserData) => {
-        console.log('received from getUserDataDB');
-        console.log(storedUserData);
         if (isOk()){
           this.getUserDataAPI(storedUserData);
         } else {
