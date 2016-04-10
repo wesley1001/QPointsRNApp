@@ -4,6 +4,7 @@
 import React from 'react-native';
 import Storage from 'react-native-store';
 import {redeemPoint} from '../components/ApiUtils';
+import {isOk} from '../components/IsConnected';
 
 var {
   Alert,
@@ -16,11 +17,29 @@ var {
 
 const DB = { 'userData': Storage.model('userData') };
 
+var jsEncode = {
+    encode: function (s, k) {
+      var enc = "";
+      var str = "";
+      // make sure that input is string
+      str = s.toString();
+      for (var i = 0; i < s.length; i++) {
+        // create block
+        var a = s.charCodeAt(i);
+        // bitwise XOR
+        var b = a ^ k;
+        enc = enc + String.fromCharCode(b);
+      }
+      return enc;
+    }
+  };
+
 var Program = React.createClass({
 
   getInitialState() {
     return {
-      programKey: '',
+      inputKey: '',
+      decodedKey: '',
       redeemStatus: false,
       userPoints: ''
     };
@@ -29,7 +48,6 @@ var Program = React.createClass({
   componentWillMount() {
     DB.userData.findById(1)
       .then((storedUserData) => {
-        console.log(storedUserData);
         this.setState({
           userPoints: storedUserData.userPoints
         });
@@ -38,11 +56,11 @@ var Program = React.createClass({
 
   _handleKeyInput(inputText){
     this.setState({
-      programKey: inputText
-    })
+      inputKey: inputText
+    });
   },
 
-  _onPressKeyVerification(){
+  _onPressRedeem(){
     redeemPoint( this.props.data.programNr, this.props.data.programGoal, this.props.userToken)
       .then((response) => {
         var programNr = this.props.data.programNr;
@@ -77,50 +95,82 @@ var Program = React.createClass({
       });
   },
 
-  _onPressRedeem(){
+  _onPressVerfiy(){
+    var decoded = jsEncode.encode(this.state.inputKey, this.props.data.programKey); // 'Jcnnm'
     this.setState({
-      redeemStatus: true
+      redeemStatus: true,
+      decodedKey:  decoded
     });
   },
 
   render: function() {
     var programData = this.props.data;
-    console.log('I am in ProgramDetail');
-    console.log(programData);
-    var Btn = (programData.programsFinished != 0 && this.state.redeemStatus=== false ) ? (
-      <TouchableHighlight
-        style={styles.button}
-        onPress ={() => this._onPressRedeem()} >
-        <Text style={styles.buttonText} >QPoints einlösen</Text>
-      </TouchableHighlight>
-      ) : (this.state.redeemStatus===true) ? (
-      <TouchableHighlight
-        style={styles.button}
-        onPress ={() => this._onPressKeyVerification()} >
-        <Text style={styles.buttonText} >Verifizieren & Einlösen</Text>
-      </TouchableHighlight>
-      ) : (<Text/>);
+
     var collected = (programData.programsFinished > 0) ? (
       <View style={styles.infoCircle}>
         <Text style={styles.infoText}>{programData.programsFinished}</Text>
       </View>
       ) : (<View style={styles.subContentFrame}><Text style={styles.contentText}>0</Text></View>);
-    var keyInput = (this.state.redeemStatus===false) ? (
-      <View style={styles.inputFrame}>
-        <Text style={styles.inputText}>Bitten Sie den Ladeninhaber um den Einlöse-Schlüssel und geben Sie diesen hier ein</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType='default'
-          placeholder='Einlöse-Schlüssel'
-          onChangeText={(text) => this._handleKeyInput(text)} />
-      </View>
-      ) : (<Text></Text>);
+
+    var redeemComponent, redeemBtn;
+    if (programData.programsFinished <= 0) {
+      console.log('Scenario 1');
+      redeemComponent = (<View style={styles.itemVerification}></View>);
+      redeemBtn = (<View style={styles.itemBtn}></View>);
+    } else if (this.state.redeemStatus === false){
+      console.log('Scenario 2');
+      redeemComponent = (
+        <View style={styles.itemVerification}>
+          <View style={styles.inputFrame}>
+            <Text style={styles.inputText}>Bitten Sie den Ladeninhaber um den Einlöse-Schlüssel und geben Sie diesen hier ein</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType='default'
+              placeholder='Einlöse-Schlüssel'
+              onChangeText={(text) => this._handleKeyInput(text)} />
+          </View>
+        </View>
+      );
+      redeemBtn = (
+        <View style={styles.itemBtn}>
+          <TouchableHighlight
+          style={styles.button}
+          onPress ={() => this._onPressVerfiy()} >
+            <Text style={styles.buttonText} >Einlöse-Schlüssel Verifizieren</Text>
+          </TouchableHighlight>
+        </View>
+      );
+    } else {
+      console.log('Scenario 3');
+      redeemComponent = (
+        <View style={styles.itemVerification}>
+          <View style={styles.inputFrame}>
+            <TextInput
+              style={styles.input}
+              editable={false}
+              placeholder={this.state.inputKey} />
+            <Text style={styles.inputText}>Bitten Sie den Ladeninhaber den Schlüssel{'\n\n'}&quot;{this.state.decodedKey}&quot;{'\n\n'}zu bestätigen und lösen Sie dann ein.</Text>
+          </View>
+        </View>
+      );
+      redeemBtn = (
+        <View style={styles.itemBtn}>
+          <TouchableHighlight
+            style={styles.button}
+            onPress ={() => this._onPressRedeem()} >
+            <Text style={styles.buttonText} >QPoints einlösen</Text>
+          </TouchableHighlight>
+        </View>
+      );
+    }
+    
     var startDate = programData.programStartDate.slice(8,10) + '.'
       + programData.programStartDate.slice(5,7) + '.'
       + programData.programStartDate.slice(0,4);
     var endDate = programData.programEndDate.slice(8,10) + '.'
       + programData.programEndDate.slice(5,7) + '.'
       + programData.programEndDate.slice(0,4);
+
     return (
       <View style={styles.container}>
         <View style={styles.itemHeader}>
@@ -140,20 +190,16 @@ var Program = React.createClass({
           <Text style={styles.contentText}>{programData.zip} {programData.companyCity}</Text>
           <Text style={styles.contentText}>{programData.phone} </Text>
           <View style={styles.itemSubContent}>
-          <View style={styles.subContentFrame}>
-            <Text style={styles.contentText}>Bereits zum Einlösen erreicht: </Text>
-          </View>
-          <View style={styles.subContentInfo}>
-            {collected}
+            <View style={styles.subContentFrame}>
+              <Text style={styles.contentText}>Bereits zum Einlösen erreicht: </Text>
+            </View>
+            <View style={styles.subContentInfo}>
+              {collected}
+            </View>
           </View>
         </View>
-        </View>
-        <View style={styles.itemVerification}>
-          {keyInput}
-        </View>
-        <View style={styles.itemBtn}>
-            {Btn}
-          </View>
+        {redeemComponent}
+        {redeemBtn}
       </View>
     );
   }
