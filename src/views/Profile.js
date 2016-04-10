@@ -4,6 +4,7 @@
 import React from 'react-native';
 import Storage from 'react-native-store';
 import {updateProfile, loginUser} from '../components/ApiUtils';
+import {isOk} from '../components/IsConnected';
 
 var {
   Alert,
@@ -100,34 +101,45 @@ var Profile = React.createClass({
 
   _onPressUpdate(){
     if (this.state.userPW2===this.state.userPW){
-      updateProfile(this.state.gender, this.state.userPW, this.state.userToken)
-        .then((resp) => {
-          this._storeAndExit(resp)
-        })
-        .catch((err) => {
-          console.log(err);
-          if (err.message === 'Authorization has expired') {
-            loginUser(this.state.userEmail, this.state.currentPW)
-              .then((response) => {
-                if(response.success === true) {
-                  this.setState({
-                    userToken: response.token
-                  });
-                  console.log('versuchen wir es nochmals...');
-                  this._onPressUpdate();
-                } else {
-                  console.log('API reports no new token');
-                  console.log(response);
-                }
-              })
-              .catch((err) => console.log(`There was an error: ${err}`));
-          }
-        })
+      if (isOk()) {
+        updateProfile(this.state.gender, this.state.userPW, this.state.userToken)
+          .then((resp) => {
+            this._storeAndExit(resp)
+          })
+          .catch((err) => {
+            console.log(err);
+            if (err.message === 'Authorization has expired') {
+              loginUser(this.state.userEmail, this.state.currentPW)
+                .then((response) => {
+                  if(response.success === true) {
+                    this.setState({
+                      userToken: response.token
+                    });
+                    console.log('versuchen wir es nochmals...');
+                    this._onPressUpdate();
+                  } else {
+                    console.log('API reports no new token');
+                    console.log(response);
+                  }
+                })
+                .catch((err) => console.log(`There was an error: ${err}`));
+            }
+          });
+      } else {
+        console.log('no Internet connection');
+        Alert.alert(
+          'Sie haben keine Internet Verbindung','Bitte versuchen Sie es später erneut',
+          [{text: 'Ok', onPress: () => {}},]
+        );
+      }
     } else {
+      console.log('passwords not identical');
       this.setState({
         errorPW: true
       });
+      console.log('passwords not identical2');
       this._PW2Input.setNativeProps({text: ''});
+      console.log('passwords not identical3');
     }
   },
 
