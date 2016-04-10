@@ -80,7 +80,7 @@ var Program = React.createClass({
           });
         } else {
           Alert.alert(
-            'QPoint could not be redeemed',
+            'QPoint konnte nicht eingelöst werden',
             response.message,
             [
               {text: 'Warnung', onPress: () => {
@@ -96,11 +96,18 @@ var Program = React.createClass({
   },
 
   _onPressVerfiy(){
-    var decoded = jsEncode.encode(this.state.inputKey, this.props.data.programKey); // 'Jcnnm'
-    this.setState({
-      redeemStatus: true,
-      decodedKey:  decoded
-    });
+    if (this.state.inputKey !== '') {
+      var decoded = jsEncode.encode(this.state.inputKey, this.props.data.programKey); // 'Jcnnm'
+      this.setState({
+        redeemStatus: true,
+        decodedKey:  decoded
+      });
+    } else {
+      Alert.alert(
+        'Bitte einlöse Schlüssel vom Ladeninhaber eingeben','',
+        [{text: 'Ok', onPress: () => {}},]
+      );
+    }
   },
 
   render: function() {
