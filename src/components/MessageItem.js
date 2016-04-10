@@ -18,18 +18,26 @@ var MessageItem = React.createClass({
   },
 
   render: function() {
+    console.log('rendering Rows');
+    var message = this.props.message;
+    var newMessage = (message.readStatus) ? (<Text></Text>) : (
+        <View style={styles.infoCircle}>
+          <Text style={styles.infoText}>!</Text>
+        </View>
+      );
     return (
       <TouchableHighlight onPress={() => this.props.onClick(this.props.rowID)}  underlayColor='#dddddd'>
         <View style={styles.itemContainer}>
 
-          <View style={styles.itemContent} >
-            <Text style={styles.itemHeader}>{this.props.message.newsDate} {this.props.message.company}</Text>
-              <Text style={styles.itemTitle}>{this.props.message.newsTitle}</Text>
-              <Text style={styles.itemText}>{this.props.message.newsMessage}</Text>
+          <View style={styles.itemInfo}>
+            {newMessage}
           </View>
 
-          <View style={styles.itemNav}>
-            <Text>></Text>
+          <View style={styles.itemContent} >
+            <Text style={styles.contentAddress} numberOfLines={1}>{message.newsDate}</Text>
+            <Text style={styles.contentHeader} numberOfLines={1}>{message.company}</Text>
+            <Text style={styles.contentTitle} numberOfLines={1}>{message.newsTitle}</Text>
+            <Text style={styles.contentAddress} numberOfLines={1}>{message.newsMessage}</Text>
           </View>
 
         </View>
@@ -49,22 +57,47 @@ var styles = StyleSheet.create({
     borderBottomColor: 'white',
     borderBottomWidth: 1
   },
-  itemContent: {
-    flex: 19,
-    flexDirection: 'column'
-  },
-  itemHeader: {
-
-  },
-  itemTitle: {
-
-  },
-  itemNav: {
+  // Already successful collected Points
+  itemInfo:{
     flex: 1,
-    justifyContent: 'center'
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    paddingTop: 10
   },
-  itemText: {
-    height: 50
+  infoCircle:{
+    justifyContent: 'center',
+    backgroundColor: '#01577A',
+    borderColor: 'white',
+    borderWidth: 1,
+    height: 16,
+    width: 16,
+    borderRadius: 8
+  },
+  infoText:{
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 8,
+    backgroundColor: 'rgba(0,0,0,0)'
+  },
+  // Content
+  itemContent: {
+    flex: 16,
+    flexDirection: 'column',
+    justifyContent: 'space-around'
+  },
+  contentHeader: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold'
+  },
+  contentTitle: {
+    color: 'white',
+    fontSize: 18
+  },
+  contentAddress: {
+    color: 'white',
+    fontSize: 14
   },
 });
 

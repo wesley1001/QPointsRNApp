@@ -10,6 +10,7 @@ export function initStorage(){
 	console.log('Init Storage');
 
 	DB.user.find().then((response) => {
+		console.log('this was found in Init');
 		console.log(response);
 	  if (!response) {
 	  	console.log('User neu anlagen');
@@ -24,6 +25,7 @@ export function initStorage(){
 	});
 
 	DB.userData.find().then((response) => {
+		console.log('this was find during Init');
 		console.log(response);
 	  if (!response) {
 	  	console.log('userData neu anlegen');
