@@ -5,8 +5,10 @@ import React from 'react-native';
 import Camera  from 'react-native-camera';
 import {CheckCode} from '../components/ApiUtils';
 import Storage from 'react-native-store';
+import {isOk} from '../components/IsConnected';
 
 var {
+  Alert,
   AlertIOS,
   StyleSheet,
   Text,
@@ -65,21 +67,32 @@ var Scan = React.createClass({
   },
 
   _onBarCodeRead: function(e) {
-    this.setState({showCamera: false});
-    CheckCode(e.data, this.state.userToken).then((response) => {
-      var alertTitle;
-      if (response.success === false) {
-        alertTitle = 'Leider ist der QR-Code nicht gültig';
-      } else {
-        alertTitle = 'Herzliche Glückwünsche';
-        this.updateUserData(response.nr);
-      }
-      AlertIOS.alert(
-          alertTitle,
-          response.message
+    if (isOk()) {
+      this.setState({showCamera: false});
+      CheckCode(e.data, this.state.userToken)
+        .then((response) => {
+          var alertTitle;
+          if (response.success === false) {
+            alertTitle = 'Leider ist der QR-Code nicht gültig';
+          } else {
+            alertTitle = 'Herzliche Glückwünsche';
+            this.updateUserData(response.nr);
+          }
+          AlertIOS.alert(
+              alertTitle,
+              response.message
+          );
+          this.setState({showCamera: true});  
+        });
+    } else {
+      this.setState({showCamera: false});
+      console.log('no Internet connection');
+      Alert.alert(
+        'Sie haben keine Internet Verbindung','Bitte versuchen Sie es später erneut',
+        [{text: 'Ok', onPress: () => {}},]
       );
-      this.setState({showCamera: true});  
-    });
+      this.setState({showCamera: true});
+    }
   },
 
   updateUserData(codeProgramNr){

@@ -96,7 +96,7 @@ var MyPoints = React.createClass({
 
   _handleScroll(e) {
     if (e.nativeEvent.contentOffset.y < -45) {
-      console.log(('Seconds since last update ' + ((Date.parse(new Date()) - this.state.lastSync))/1000));
+      console.log(('Seconds since last update and state ' + this.state.reloading + ' ' + ((Date.parse(new Date()) - this.state.lastSync))/1000));
       if ( this.state.reloading === true || (((Date.parse(new Date()) - this.state.lastSync))/1000 < 20) ) {
         return;
       } else {
