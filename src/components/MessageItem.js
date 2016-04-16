@@ -27,17 +27,13 @@ var MessageItem = React.createClass({
       );
     return (
       <TouchableHighlight onPress={() => this.props.onClick(this.props.rowID)}  underlayColor='#dddddd'>
-        <View style={styles.itemContainer}>
-
-          <View style={styles.itemContent} >
+        <View style={styles.itemContainer}>  
           <View style={styles.content1stLine}>
             {newMessage}
             <Text style={styles.contentSubHeader} numberOfLines={1}>{message.newsDate}</Text>
           </View>
-            <Text style={styles.contentHeader} numberOfLines={1}>{message.company}</Text>
-            <Text style={styles.contentTitle} numberOfLines={1}>{message.newsTitle}: {message.newsMessage}</Text>
-          </View>
-
+          <Text style={styles.contentHeader} numberOfLines={1}>{message.company}</Text>
+          <Text style={styles.contentText} numberOfLines={1}>{message.newsTitle}: {message.newsMessage}</Text>
         </View>
       </TouchableHighlight>
     );
@@ -48,25 +44,20 @@ var MessageItem = React.createClass({
 var styles = StyleSheet.create({
 	itemContainer: {
     flex: 1,
-    flexDirection: 'row',
-    padding: 5,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    paddingLeft: 10,
+    paddingRight: 10,
     height: 100,
     backgroundColor: '#9DC02E',
     borderBottomColor: 'white',
     borderBottomWidth: 1
   },
   // Content
-  itemContent: {
-    flex: 16,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    paddingLeft: 10
-  },
   content1stLine: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 19,
-    marginTop: 5  
+    height: 19
   },
   // Already successful collected Points
   infoCircle:{
@@ -89,12 +80,12 @@ var styles = StyleSheet.create({
     color: 'white',
     fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 3
+    marginTop: 5
   },
-  contentTitle: {
+  contentText: {
     color: 'white',
     fontSize: 18,
-    marginTop: 3
+    marginTop: 5
   },
   contentSubHeader: {
     color: 'white',
