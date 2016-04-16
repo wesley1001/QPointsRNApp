@@ -40,7 +40,7 @@ var Program = React.createClass({
     return {
       inputKey: '',
       decodedKey: '',
-      redeemStatus: false,
+      redeemStatus: 0,
       userPoints: ''
     };
   },
@@ -49,7 +49,8 @@ var Program = React.createClass({
     DB.userData.findById(1)
       .then((storedUserData) => {
         this.setState({
-          userPoints: storedUserData.userPoints
+          userPoints: storedUserData.userPoints,
+          redeemStatus: 0
         });
       });
   },
@@ -75,23 +76,26 @@ var Program = React.createClass({
             DB.userData.updateById({
               userPoints: userPoints
             },1).then(() => {
+              Alert.alert(
+                'Herzliche Glückwünsche!','Hiermit haben Sie die gesammelten QPoints eingelöst',
+                [{text: 'Ok', onPress: () => {}},]
+              );
               this.setState({
-                redeemStatus: false 
+                redeemStatus: 0
               });
             });
           } else {
             Alert.alert(
               'QPoint konnte nicht eingelöst werden',
               response.message,
-              [
-                {text: 'Warnung', onPress: () => {
-                  this.setState({
-                    redeemStatus: false 
-                  });
-                  console.log('Konnte leider nicht eingelöst werden');
-                }},
-              ]
+              [{text: 'Warnung', onPress: () => console.log('Konnte leider nicht eingelöst werden') },]
             );
+            this.setState({ redeemStatus: 0 });
+            // this.props.navigator.replace({
+            //   id: 'ProgramDetail',
+            //   data: this.props.data,
+            //   userToken: this.props.userToken
+            // });
           }
         });
     } else {
@@ -100,6 +104,7 @@ var Program = React.createClass({
         'Sie haben keine Internet Verbindung','Bitte versuchen Sie es später erneut',
         [{text: 'Ok', onPress: () => {}},]
       );
+      this.props.navigator.pop();
     }
   },
 
@@ -107,7 +112,7 @@ var Program = React.createClass({
     if (this.state.inputKey !== '') {
       var decoded = jsEncode.encode(this.state.inputKey, this.props.data.programKey); // 'Jcnnm'
       this.setState({
-        redeemStatus: true,
+        redeemStatus: 2,
         decodedKey:  decoded
       });
     } else {
@@ -118,6 +123,10 @@ var Program = React.createClass({
     }
   },
 
+  _onPressStartRedeem(){
+    this.setState({ redeemStatus: 1 });
+  },
+
   render: function() {
     var programData = this.props.data;
 
@@ -125,17 +134,30 @@ var Program = React.createClass({
       <View style={styles.infoCircle}>
         <Text style={styles.infoText}>{programData.programsFinished}</Text>
       </View>
-      ) : (<View style={styles.subContentFrame}><Text style={styles.contentText}>0</Text></View>);
+      ) : (<Text></Text>);
 
-    var redeemComponent, redeemBtn;
+    var redeem;
     if (programData.programsFinished <= 0) {
       console.log('Scenario 1');
-      redeemComponent = (<View style={styles.itemVerification}></View>);
-      redeemBtn = (<View style={styles.itemBtn}></View>);
-    } else if (this.state.redeemStatus === false){
+      redeem = (<View style={styles.itemRedeemFrame}></View>);
+    } else if (programData.programsFinished > 0 && this.state.redeemStatus === 0) {
       console.log('Scenario 2');
-      redeemComponent = (
-        <View style={styles.itemVerification}>
+      redeem = (
+        <View style={styles.itemRedeemFrame}>
+          <View style={styles.inputFrame}>
+            <Text style={styles.inputText}>Sie haben bereits genügend QPoints gesammelt und können {programData.programsFinished} Gewinn(e) einlösen.</Text>
+          </View>
+          <TouchableHighlight
+          style={styles.button}
+          onPress ={() => this._onPressStartRedeem()} >
+            <Text style={styles.buttonText} >Einlösen starten</Text>
+          </TouchableHighlight>
+        </View>
+      );
+    } else if (this.state.redeemStatus === 1){
+      console.log('Scenario 3');
+      redeem = (
+        <View style={styles.itemRedeemFrame}>
           <View style={styles.inputFrame}>
             <Text style={styles.inputText}>Bitten Sie den Ladeninhaber um den Einlöse-Schlüssel und geben Sie diesen hier ein</Text>
             <TextInput
@@ -144,10 +166,6 @@ var Program = React.createClass({
               placeholder='Einlöse-Schlüssel'
               onChangeText={(text) => this._handleKeyInput(text)} />
           </View>
-        </View>
-      );
-      redeemBtn = (
-        <View style={styles.itemBtn}>
           <TouchableHighlight
           style={styles.button}
           onPress ={() => this._onPressVerfiy()} >
@@ -155,21 +173,17 @@ var Program = React.createClass({
           </TouchableHighlight>
         </View>
       );
-    } else {
-      console.log('Scenario 3');
-      redeemComponent = (
-        <View style={styles.itemVerification}>
+    } else if (this.state.redeemStatus === 2) {
+      console.log('Scenario 4');
+      redeem = (
+        <View style={styles.itemRedeemFrame}>
           <View style={styles.inputFrame}>
+            <Text style={styles.inputText}>Bitten Sie den Ladeninhaber den Schlüssel{'\n'}&quot;{this.state.decodedKey}&quot;{'\n'}zu bestätigen und lösen Sie dann ein.</Text>
             <TextInput
               style={styles.input}
               editable={false}
               placeholder={this.state.inputKey} />
-            <Text style={styles.inputText}>Bitten Sie den Ladeninhaber den Schlüssel{'\n\n'}&quot;{this.state.decodedKey}&quot;{'\n\n'}zu bestätigen und lösen Sie dann ein.</Text>
           </View>
-        </View>
-      );
-      redeemBtn = (
-        <View style={styles.itemBtn}>
           <TouchableHighlight
             style={styles.button}
             onPress ={() => this._onPressRedeem()} >
@@ -188,11 +202,14 @@ var Program = React.createClass({
 
     return (
       <View style={styles.container}>
-        <View style={styles.itemHeader}>
-          <View style={styles.headerFrame}>
-            <Text style={styles.headerTitle}>{programData.programCompany}</Text>
-            <Text style={styles.headerSubTitle}>{programData.programName}</Text>
-            <Text style={styles.headerText}>Gültig: {startDate} bis {endDate}</Text>
+
+        <View style={styles.itemContent}>
+          <View style={styles.contentFrame}>
+            <Text style={styles.contentTitle}>{programData.programName}</Text>
+            <View style={styles.content2ndLine}>
+              {collected}
+              <Text style={styles.contentHeader}>{programData.programCompany}</Text>
+            </View>
           </View>
           <View style={styles.itemPoints}>
             <View style={styles.pointsCircle}>
@@ -200,21 +217,17 @@ var Program = React.createClass({
             </View>
           </View>
         </View>
-        <View style={styles.itemContent}>
-          <Text style={styles.contentText}>{programData.address1} {programData.address2}</Text>
-          <Text style={styles.contentText}>{programData.zip} {programData.companyCity}</Text>
-          <Text style={styles.contentText}>{programData.phone} </Text>
-          <View style={styles.itemSubContent}>
-            <View style={styles.subContentFrame}>
-              <Text style={styles.contentText}>Bereits zum Einlösen erreicht: </Text>
-            </View>
-            <View style={styles.subContentInfo}>
-              {collected}
-            </View>
-          </View>
+
+        <View style={styles.itemContent2}>
+          <Text style={styles.content2Text}>{programData.address1} {programData.address2}</Text>
+          <Text style={styles.content2Text}>{programData.zip} {programData.city}</Text>
+          <Text style={styles.content2Text}>{programData.phone} </Text>
+          <Text style={styles.content2Text}>Gültig: {startDate} bis {endDate}</Text>
+          
         </View>
-        {redeemComponent}
-        {redeemBtn}
+        <View style={styles.itemInbetween}></View>
+        {redeem}
+
       </View>
     );
   }
@@ -228,36 +241,56 @@ var styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#9DC02E',
   },
-  // HEADER ===========================
-  itemHeader:{
+  // CONTENT ===========================
+  itemContent:{
     flex: 2.5,
     alignSelf: 'stretch',
     flexDirection: 'row'
   },
-  headerFrame: {
-    flex: 3,
-    padding: 10,
-    justifyContent: 'space-between',
+  contentFrame: {
+    flex: 15,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    paddingLeft: 10
   },
-  headerTitle: {
+  contentTitle: {
     color: 'white',
     fontSize: 20,
-    fontWeight: 'bold'
+    fontWeight: 'normal'
   },
-  headerSubTitle: {
+  contentHeader: {
     color: 'white',
-    fontSize: 20
+    fontSize: 18
   },
-  headerText: {
+  content2ndLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 33,
+    marginTop: 5
+  },
+  // Already successful collected Points
+  infoCircle: {
+    justifyContent: 'center',
+    backgroundColor: '#01577A',
+    borderColor: 'white',
+    borderWidth: 1,
+    height: 30,
+    width: 30,
+    borderRadius: 15,
+    marginRight: 5
+  },
+  infoText: {
+    textAlign: 'center',
     color: 'white',
-    fontSize: 16
+    fontSize: 12,
+    backgroundColor: 'rgba(0,0,0,0)'
   },
   // HEADER CIRCLE
   itemPoints:{
-    flex: 1,
+    flex: 5,
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   pointsCircle:{
     justifyContent: 'center',
@@ -275,60 +308,62 @@ var styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold'
   },
-  // CONTENT ===========================
-  itemContent: {
-    flex: 2,
-    alignSelf: 'stretch',
+  // CONTENT2 ===========================
+  itemContent2: {
+    flex: 3,
     flexDirection: 'column',
-    padding: 10
+    alignSelf: 'stretch',
+    justifyContent: 'flex-start',
+    paddingLeft: 10
   },
-  contentText: {
+  content2Text: {
     color: 'white',
-    fontSize: 16
+    fontSize: 16,
+    marginBottom: 5,
+    marginRight: 5
   },
   // SUBCONTENT ===========================
-  itemSubContent: {
+  itemSubContent2: {
     alignSelf: 'stretch',
     flexDirection: 'row'
   },
-  subContentFrame: {
-    alignSelf: 'center',
+  subContent2Frame: {
+    alignSelf: 'center'
   },
-  // SubContentInfo
-  subContentInfo:{
+  // SubContent2Info
+  subContent2Info:{
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingTop: 2
+    paddingTop: 2 
   },
-  infoCircle:{
-    justifyContent: 'center',
-    backgroundColor: '#01577A',
-    height: 30,
-    width: 30,
-    borderRadius: 15
+  // INBETWEEN SPACE ========================
+  itemInbetween: {
+    flex: 2,
+    alignSelf: 'stretch',
+    backgroundColor: '#01577A'
   },
-  infoText:{
-    textAlign: 'center',
-    color: 'white',
-    fontSize: 12,
-    backgroundColor: 'rgba(0,0,0,0)'
-  },
-  // VERIFICATION ===========================
-  itemVerification: {
+  // REDEEM FRAME ==================
+  itemRedeemFrame: {
     flex: 5,
     alignSelf: 'stretch',
+    justifyContent: 'center',
     backgroundColor: '#01577A',
+    borderBottomColor: 'white',
+    borderBottomWidth: 1,
   },
+  // VERIFICATION ===========================
   inputFrame: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center'
   },
   inputText: {
-    padding: 10,
     fontSize: 16,
-    color: 'white'
+    color: 'white',
+    textAlign: 'center',
+    marginLeft: 25,
+    marginRight: 25
   },
   input: {
     height: 40,
@@ -336,18 +371,12 @@ var styles = StyleSheet.create({
     backgroundColor: 'white',
     borderWidth: 1,
     borderRadius: 8,
-    margin: 25,
+    marginTop: 10,
+    marginLeft: 25,
+    marginRight: 25,
     paddingLeft: 5
   },
   // BTN ===========================
-  itemBtn: {
-    flex: 3,
-    alignSelf: 'stretch',
-    justifyContent: 'center',
-    backgroundColor: '#01577A',
-    borderBottomColor: 'white',
-    borderBottomWidth: 1,
-  },
   buttonText: {
     fontSize: 18,
     color: 'white',
@@ -358,7 +387,9 @@ var styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#FF2B4B',
     borderRadius: 8,
-    margin: 20,
+    marginTop: 10,
+    marginLeft: 25,
+    marginRight: 25,
     alignSelf: 'stretch',
     justifyContent: 'center'
   }
