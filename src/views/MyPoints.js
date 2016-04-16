@@ -86,6 +86,14 @@ var MyPoints = React.createClass({
     );
   },
 
+  _renderHeader(){
+    return (
+      <View style={styles.listViewHeader}>
+        <Text style={styles.headerText}>MEINE PROGRAMME</Text>
+      </View>
+    )
+  },
+
   _itemPressed: function(rowID) {
     this.props.navigator.push({
       id: 'ProgramDetail',
@@ -117,6 +125,7 @@ var MyPoints = React.createClass({
           dataSource={this.state.dataSource}
           onScroll={this._handleScroll}
           renderRow={this._renderRow}
+          renderHeader={this._renderHeader}
           />
       </View>
     );
@@ -130,6 +139,16 @@ var styles = StyleSheet.create({
     borderBottomColor: 'white',
     borderBottomWidth: 1,
   },
+  listViewHeader: {
+    paddingLeft: 10,
+    paddingTop: 5,
+    paddingBottom: 5,
+    backgroundColor: '#FF2B4B'
+  },
+  headerText: {
+    color: 'white',
+    fontSize: 18
+  }
 });
 
 module.exports = MyPoints;
