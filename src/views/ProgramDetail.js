@@ -222,7 +222,7 @@ var Program = React.createClass({
           <Text style={styles.content2Text}>{programData.address1} {programData.address2}</Text>
           <Text style={styles.content2Text}>{programData.zip} {programData.city}</Text>
           <Text style={styles.content2Text}>{programData.phone} </Text>
-          <Text style={styles.content2Text}>Gültig: {startDate} bis {endDate}</Text>
+          <Text style={styles.content2Text}>Gültig von {startDate} bis {endDate}</Text>
           
         </View>
         <View style={styles.itemInbetween}></View>

@@ -31,6 +31,7 @@ var Login = React.createClass({
       oldUser: '',
       userPW: '',
       oldPW: '',
+      userName: '',
       userToken: '',
       loggedIn: false,
       error: false,
@@ -49,6 +50,7 @@ var Login = React.createClass({
       if (!user.loggedIn){
         this.setState({
           userEmail: user.userEmail,
+          userName: user.userName,
           oldUser: user.userEmail,
           userPW: user.userPW,
           oldPW: user.userPW,
@@ -113,6 +115,7 @@ var Login = React.createClass({
     }
     DB.user.updateById({
       userEmail: this.state.userEmail,
+      userName: this.state.userName,
       userPW: this.state.userPW,
       userRole: role,
       userToken: token,
@@ -130,7 +133,8 @@ var Login = React.createClass({
           if(response.success === true) {
             this.setState({
               userToken: response.token,
-              userRole: response.role 
+              userRole: response.role,
+              userName: response.name
             });
             this._saveToken(response.token, response.role);
             getUserData(response.token)

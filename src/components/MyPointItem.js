@@ -20,7 +20,6 @@ var MyPointItem = React.createClass({
 
   render: function() {
     var programData = this.props.programData;
-    console.log(programData);
     var collected = (programData.programsFinished > 0) ? (
       <View style={styles.infoCircle}>
         <Text style={styles.infoText}>{programData.programsFinished}</Text>

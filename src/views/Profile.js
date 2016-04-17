@@ -23,6 +23,7 @@ var Profile = React.createClass({
   getInitialState(){
     return {
       userEmail: '',
+      userName: '',
       userRole: '',
       currentPW: '',
       errorPW: false,
@@ -40,6 +41,7 @@ var Profile = React.createClass({
     DB.user.findById(1).then((resp) => {
       this.setState({
         userEmail: resp.userEmail,
+        userName: resp.userName,
         currentPW: resp.userPW,
         userRole: resp.userRole,
         userToken: resp.userToken
@@ -158,45 +160,65 @@ var Profile = React.createClass({
     var placeholderPW2 = !this.state.errorPW ? 'Bitte Password wiederholen' : 'Passwörter nicht identisch';
     return (
       <View style={styles.container}>
-        <Text>User-Email:</Text>
-        <View style={[styles.textField, styles.bgBlue]}>
-          <Text style={styles.textInField}>{this.state.userEmail}</Text>
+        <View style={styles.itemContent}>
+          <View style={styles.listViewHeader}>
+            <Text style={styles.headerText}>MEIN PROFIL</Text>
+          </View>
+          <View style={styles.contentLine}>
+              <View style={styles.contentLeft}><Text style={styles.textLeft}>User-Email:</Text></View>
+              <View style={styles.contentRight}><Text style={styles.textRight}>{this.state.userEmail}</Text></View>            
+          </View>
+          <View style={styles.contentLine}>
+            <View style={styles.contentLeft}><Text style={styles.textLeft}>Name:</Text></View>
+            <View style={styles.contentRight}><Text style={styles.textRight}>{this.state.userName}</Text></View>
+          </View>
+          <View style={styles.contentLine}>
+            <View style={styles.contentLeft}><Text style={styles.textLeft}>Rolle:</Text></View>
+            <View style={styles.contentRight}><Text style={styles.textRight}>{this.state.userRole}</Text></View>
+          </View>
+          <View style={styles.contentLine}>
+            <View style={styles.contentLeft}><Text style={styles.textLeft}>Geschlecht:</Text></View>
+            <View style={styles.contentRight}><Text style={styles.textRight}>{gender}</Text></View>
+          </View>
+          <View style={styles.contentLine}>
+            <View style={styles.contentLeft}><Text style={styles.textLeft}>Passwort:</Text></View>
+            <View style={styles.contentRight}>
+              <TextInput 
+                keyboardType='default'
+                style={styles.inputText}
+                secureTextEntry={true}
+                placeholder='Passwort ändern'
+                placeholderTextColor= '#01577A'
+                onChangeText={(text) => this._handlePWInput(text)} />
+            </View>
+          </View>
+          <View style={styles.contentLine}>
+            <View style={styles.contentLeft}><Text style={styles.textLeft}></Text></View>
+            <View style={styles.contentRight}>
+              <TextInput 
+                keyboardType='default'
+                style={styles.inputText}
+                secureTextEntry={true}
+                placeholder= {placeholderPW2}
+                placeholderTextColor= '#01577A'
+                onChangeText={(text) => this._handlePWInput2(text)}
+                ref={component => this._PW2Input = component}  />
+            </View>
+          </View>
         </View>
-        <Text>Rolle:</Text>
-        <View style={[styles.textField, styles.bgBlue]}>
-          <Text style={styles.textInField}>{this.state.userRole}</Text>
-        </View>
-        <Text>Geschlecht:</Text>
-        <View style={[styles.textField, styles.bgBlue]}>
-          <Text style={styles.textInField}>{gender}</Text>
-        </View>
-        <TextInput
-          style={[styles.textField, styles.bgGrey, styles.textInField]}
-          keyboardType='default'
-          secureTextEntry={true}
-          placeholder='Passwort ändern'
-          placeholderTextColor= '#01577A'
-          onChangeText={(text) => this._handlePWInput(text)} />
-        <TextInput
-          style={[styles.textField, styles.bgGrey, styles.textInField]}
-          keyboardType='default'
-          secureTextEntry={true}
-          placeholder= {placeholderPW2}
-          placeholderTextColor= '#01577A'
-          onChangeText={(text) => this._handlePWInput2(text)}
-          ref={component => this._PW2Input = component} />
 
-        <TouchableHighlight
-          style={[styles.button, styles.bgBlue]}
-          onPress ={() => this._onPressUpdate()} >
-          <Text style={styles.buttonText} >Änderungen sichern</Text>
-        </TouchableHighlight>
-
-        <TouchableHighlight
-          style={[styles.button, styles.bgWhite]}
-          onPress ={() => this._onPressLogout()} >
-          <Text style={styles.buttonText} >Logout</Text>
-        </TouchableHighlight>
+        <View style={styles.itemBtns}>
+          <TouchableHighlight
+            style={[styles.button, styles.bgWhite]}
+            onPress ={() => this._onPressUpdate()} >
+            <Text style={[styles.buttonText, styles.btnTextBlue]} >Änderungen sichern</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={[styles.button, styles.bgRed]}
+            onPress ={() => this._onPressLogout()} >
+            <Text style={[styles.buttonText, styles.btnTextWhite]} >Logout</Text>
+          </TouchableHighlight>
+        </View>
       </View>
     );
   }
@@ -205,49 +227,83 @@ var Profile = React.createClass({
 var styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    flexDirection: 'column',
     backgroundColor: '#9DC02E',
   },
-  buttonText: {
-    fontSize: 18,
-    color: '#111',
-    alignSelf: 'center'
-  },
-  button: {
-    height: 40,
-    flexDirection: 'row',
-    borderColor: 'white',
-    borderWidth: 1,
-    borderRadius: 8,
-    margin: 20,
-    alignSelf: 'stretch',
-    justifyContent: 'center'
-  },
-  textField: {
-    flexDirection: 'row',
-    borderColor: 'white',
-    borderWidth: 1,
-    borderRadius: 8,
-    height: 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: 20,
-    padding: 10,
-    alignSelf: 'stretch',
-    justifyContent: 'center'
-  },
-  bgBlue: {
-    backgroundColor: '#01577A'
-  },
-  bgGrey: {
-    backgroundColor: '#e4e4e4'
-  },
-  bgWhite: {
-    backgroundColor: '#ffffff'
-  },
-  textInField: {
-    color: '#ffffff'
-  }
+    itemContent: {
+      flex: 7,
+      flexDirection: 'column'
+    },
+      contentLine: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingLeft: 15,
+        paddingRight: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#9BDA70'
+      },
+      contentLeft: {
+        flex: 3
+      },
+        textLeft: {
+          color: 'white',
+          fontWeight: 'bold',
+        },
+      contentRight: {
+        flex: 7
+      },
+        textRight: {
+          color: '#01577A'
+        },
+      listViewHeader: {
+        paddingLeft: 10,
+        paddingTop: 5,
+        paddingBottom: 5,
+        backgroundColor: '#FF2B4B'
+      },
+      headerText: {
+        color: 'white',
+        fontSize: 18
+      },
+      inputText: {
+        height: 30,
+        color: '#01577A',
+        fontSize: 14
+      },
+    // BTN SECTION =========================
+    itemBtns: {
+      flex: 3,
+      justifyContent: 'flex-end'
+    },
+      buttonText: {
+        fontSize: 18,
+        alignSelf: 'center'
+      },
+      button: {
+        height: 40,
+        flexDirection: 'row',
+        borderColor: 'white',
+        borderWidth: 1,
+        borderRadius: 8,
+        marginLeft: 25,
+        marginRight: 25,
+        marginBottom: 25,
+        alignSelf: 'stretch',
+        justifyContent: 'center'
+      },
+      btnTextWhite: {
+        color: 'white'
+      },
+      btnTextBlue: {
+        color: '#01577A',
+      },
+    bgRed: {
+      backgroundColor: '#FF2B4B'
+    },
+    bgWhite: {
+      backgroundColor: '#ffffff'
+    },
 });
 
 module.exports = Profile;

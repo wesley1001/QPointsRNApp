@@ -10,10 +10,6 @@ var {
   View,
 } = React;
 
-var toolbarActions = [
-  {title: 'Profile', icon: require('image!profile'), show: 'always'},
-];
-
 var topBar = React.createClass({
 
 	propTypes: {
@@ -22,7 +18,9 @@ var topBar = React.createClass({
 	},
 
   _onProfileClick: function(){
-    this.props.nav.push({id: 'Profile'});
+    if (this.props.displProfile){
+      this.props.nav.push({id: 'Profile'});
+    }
   },
 
   _onBackClicked: function(){
