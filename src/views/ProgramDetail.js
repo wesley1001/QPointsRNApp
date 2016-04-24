@@ -5,6 +5,7 @@ import React from 'react-native';
 import Storage from 'react-native-store';
 import {redeemPoint} from '../components/ApiUtils';
 import {isOk} from '../components/IsConnected';
+import {isHeight} from '../components/CheckDimensions';
 
 var {
   Alert,
@@ -14,6 +15,21 @@ var {
   TouchableHighlight,
   View
 } = React;
+
+var infoCircleD, pointCircleD, frameHeight, textSize1, textSize2;
+if (isHeight() < 530) {
+  infoCircleD = 16;
+  pointCircleD = 50;
+  frameHeight = 30;
+  textSize1 = 14;
+  textSize2 = 14;
+} else {
+  infoCircleD = 30;
+  pointCircleD = 80;
+  frameHeight = 40;
+  textSize1 = 18;
+  textSize2 = 16;
+}
 
 const DB = { 'userData': Storage.model('userData') };
 
@@ -150,7 +166,7 @@ var Program = React.createClass({
           <TouchableHighlight
           style={styles.button}
           onPress ={() => this._onPressStartRedeem()} >
-            <Text style={styles.buttonText} >Einlösen starten</Text>
+            <Text style={styles.buttonText} >Einlösen</Text>
           </TouchableHighlight>
         </View>
       );
@@ -178,7 +194,7 @@ var Program = React.createClass({
       redeem = (
         <View style={styles.itemRedeemFrame}>
           <View style={styles.inputFrame}>
-            <Text style={styles.inputText}>Bitten Sie den Ladeninhaber den Schlüssel{'\n'}&quot;{this.state.decodedKey}&quot;{'\n'}zu bestätigen und lösen Sie dann ein.</Text>
+            <Text style={styles.inputText}>Bestätigt der Ladeninhaber den Schlüssel{'\n'}&quot;{this.state.decodedKey}&quot; ?</Text>
             <TextInput
               style={styles.input}
               editable={false}
@@ -187,7 +203,7 @@ var Program = React.createClass({
           <TouchableHighlight
             style={styles.button}
             onPress ={() => this._onPressRedeem()} >
-            <Text style={styles.buttonText} >QPoints einlösen</Text>
+            <Text style={styles.buttonText} >Bestätigt</Text>
           </TouchableHighlight>
         </View>
       );
@@ -255,12 +271,12 @@ var styles = StyleSheet.create({
   },
   contentTitle: {
     color: 'white',
-    fontSize: 20,
+    fontSize: textSize1+2, // 16 vs 20
     fontWeight: 'normal'
   },
   contentHeader: {
     color: 'white',
-    fontSize: 18
+    fontSize: textSize1 // 14 vs 18
   },
   content2ndLine: {
     flexDirection: 'row',
@@ -274,15 +290,15 @@ var styles = StyleSheet.create({
     backgroundColor: '#01577A',
     borderColor: 'white',
     borderWidth: 1,
-    height: 30,
-    width: 30,
-    borderRadius: 15,
+    height: infoCircleD, // 16 vs 30
+    width: infoCircleD, // 16 vs 30
+    borderRadius: infoCircleD/2, // 8 vs 15
     marginRight: 5
   },
   infoText: {
     textAlign: 'center',
     color: 'white',
-    fontSize: 12,
+    fontSize: textSize2-4, // 10 vs 12
     backgroundColor: 'rgba(0,0,0,0)'
   },
   // HEADER CIRCLE
@@ -297,9 +313,9 @@ var styles = StyleSheet.create({
     backgroundColor: '#9BDA70',
     borderColor: 'white',
     borderWidth: 1,
-    height: 80,
-    width: 80,
-    borderRadius: 40
+    height: pointCircleD, // 50 vs 80
+    width: pointCircleD, // 50 vs 80
+    borderRadius: pointCircleD/2 // 25 vs 40
   },
   pointsText:{
     textAlign: 'center',
@@ -318,7 +334,7 @@ var styles = StyleSheet.create({
   },
   content2Text: {
     color: 'white',
-    fontSize: 16,
+    fontSize: textSize2, // 14 vs 16
     marginBottom: 5,
     marginRight: 5
   },
@@ -339,7 +355,7 @@ var styles = StyleSheet.create({
   },
   // INBETWEEN SPACE ========================
   itemInbetween: {
-    flex: 2,
+    flex: 0, // vs 2
     alignSelf: 'stretch',
     backgroundColor: '#01577A'
   },
@@ -359,14 +375,15 @@ var styles = StyleSheet.create({
     justifyContent: 'center'
   },
   inputText: {
-    fontSize: 16,
+    fontSize: textSize2, // 14 vs 16
     color: 'white',
     textAlign: 'center',
     marginLeft: 25,
     marginRight: 25
   },
   input: {
-    height: 40,
+    height: frameHeight, // 30 vs 40
+    fontSize: 16,
     borderColor: 'gray',
     backgroundColor: 'white',
     borderWidth: 1,
@@ -378,12 +395,12 @@ var styles = StyleSheet.create({
   },
   // BTN ===========================
   buttonText: {
-    fontSize: 18,
+    fontSize: textSize2+2, // 16 vs 18
     color: 'white',
     alignSelf: 'center'
   },
   button: {
-    height: 50,
+    height: frameHeight+10, // 40 vs 50
     flexDirection: 'row',
     backgroundColor: '#FF2B4B',
     borderRadius: 8,

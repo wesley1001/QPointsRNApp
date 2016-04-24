@@ -5,6 +5,7 @@ import React from 'react-native';
 import Storage from 'react-native-store';
 import {updateProfile, loginUser} from '../components/ApiUtils';
 import {isOk} from '../components/IsConnected';
+import {isHeight} from '../components/CheckDimensions';
 
 var {
   Alert,
@@ -17,6 +18,8 @@ var {
 
 const DB = {  'user': Storage.model('user'),
               'userData': Storage.model('userData') };
+
+const bottomMargin = (isHeight()< 530) ? 15 : 25;
 
 var Profile = React.createClass({
 
@@ -33,7 +36,8 @@ var Profile = React.createClass({
       userGender: '',
       userPoints: '',
       userMessages: [],
-      lastSync: ''
+      lastSync: '',
+      modified: false
     };
   },
 
@@ -59,14 +63,16 @@ var Profile = React.createClass({
 
   _handlePWInput(inputText){
     this.setState({
-      userPW: inputText
+      userPW: inputText,
+      modified: true
     })
   },
 
   _handlePWInput2(inputText){
     this.setState({
       userPW2: inputText,
-      errorPW: false
+      errorPW: false,
+      modified: true
     });
   },
 
@@ -102,6 +108,7 @@ var Profile = React.createClass({
   },
 
   _onPressUpdate(){
+    this.setState({ modified: false });
     if (this.state.userPW2===this.state.userPW){
       if (isOk()) {
         updateProfile(this.state.gender, this.state.userPW, this.state.userToken)
@@ -137,7 +144,8 @@ var Profile = React.createClass({
     } else {
       console.log('passwords not identical');
       this.setState({
-        errorPW: true
+        errorPW: true,
+        modified: false
       });
       console.log('passwords not identical2');
       this._PW2Input.setNativeProps({text: ''});
@@ -157,6 +165,13 @@ var Profile = React.createClass({
       default:
         gender = 'nicht angegeben';
     }
+    var updateBtn = this.state.modified ? (
+      <TouchableHighlight
+        style={[styles.button, styles.bgWhite]}
+        onPress ={() => this._onPressUpdate()} >
+        <Text style={[styles.buttonText, styles.btnTextBlue]} >Änderungen sichern</Text>
+      </TouchableHighlight>
+      ) : (<Text></Text>)
     var placeholderPW2 = !this.state.errorPW ? 'Bitte Password wiederholen' : 'Passwörter nicht identisch';
     return (
       <View style={styles.container}>
@@ -193,7 +208,7 @@ var Profile = React.createClass({
             </View>
           </View>
           <View style={styles.contentLine}>
-            <View style={styles.contentLeft}><Text style={styles.textLeft}></Text></View>
+            <View style={styles.contentLeft}><Text style={styles.textLeft}>Passwort:</Text></View>
             <View style={styles.contentRight}>
               <TextInput 
                 keyboardType='default'
@@ -208,11 +223,7 @@ var Profile = React.createClass({
         </View>
 
         <View style={styles.itemBtns}>
-          <TouchableHighlight
-            style={[styles.button, styles.bgWhite]}
-            onPress ={() => this._onPressUpdate()} >
-            <Text style={[styles.buttonText, styles.btnTextBlue]} >Änderungen sichern</Text>
-          </TouchableHighlight>
+          {updateBtn}
           <TouchableHighlight
             style={[styles.button, styles.bgRed]}
             onPress ={() => this._onPressLogout()} >
@@ -231,7 +242,7 @@ var styles = StyleSheet.create({
     backgroundColor: '#9DC02E',
   },
     itemContent: {
-      flex: 7,
+      flex: 6,
       flexDirection: 'column'
     },
       contentLine: {
@@ -273,7 +284,7 @@ var styles = StyleSheet.create({
       },
     // BTN SECTION =========================
     itemBtns: {
-      flex: 3,
+      flex: 4,
       justifyContent: 'flex-end'
     },
       buttonText: {
@@ -288,7 +299,7 @@ var styles = StyleSheet.create({
         borderRadius: 8,
         marginLeft: 25,
         marginRight: 25,
-        marginBottom: 25,
+        marginBottom: bottomMargin, // 15 vs. 25
         alignSelf: 'stretch',
         justifyContent: 'center'
       },
