@@ -96,7 +96,7 @@ var Profile = React.createClass({
       loggedIn: true
     },1);
     DB.userData.updateById({
-      userGender: this.state.gender,
+      userGender: this.state.userGender,
       userPoints: this.state.userPoints,
       userMessages: this.state.userMessages,
       lastSync: this.state.lastSync
@@ -111,8 +111,9 @@ var Profile = React.createClass({
     this.setState({ modified: false });
     if (this.state.userPW2===this.state.userPW){
       if (isOk()) {
-        updateProfile(this.state.gender, this.state.userPW, this.state.userToken)
+        updateProfile(this.state.userGender, this.state.userPW, this.state.userToken)
           .then((resp) => {
+            console.log(resp);
             this._storeAndExit(resp)
           })
           .catch((err) => {
@@ -153,17 +154,78 @@ var Profile = React.createClass({
     }
   },
 
+  _onPressGender(pressedGender){
+    this.setState({
+      modified: true,
+      userGender: pressedGender 
+    });
+  },
+
   render: function() {
     var gender;
     switch (this.state.userGender) {
       case 0:
-        gender = 'Weiblich';
+        gender = (
+          <View style={styles.segment}>
+            <TouchableHighlight
+              onPress ={() => this._onPressGender(0)}
+              style={[styles.segmentItem, styles.segmentSelected]}>
+              <Text style={[styles.segmentItemText, styles.segmentItemTextSelected]}>Weibl.</Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              onPress ={() => this._onPressGender(1)}
+              style={[styles.segmentItem, styles.segmentOption]}>
+              <Text style={[styles.segmentItemText, styles.segmentItemTextOption]}>Männl.</Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              onPress ={() => this._onPressGender(2)}
+              style={[styles.segmentItem, styles.segmentOption, styles.segmentSeparator]}>
+              <Text style={[styles.segmentItemText, styles.segmentItemTextOption]}>Geheim</Text>
+            </TouchableHighlight>
+          </View>
+        );
         break;
       case 1:
-        gender = 'Männlich';
+        gender = (
+          <View style={styles.segment}>
+            <TouchableHighlight
+              onPress ={() => this._onPressGender(0)}
+              style={[styles.segmentItem, styles.segmentOption]}>
+              <Text style={[styles.segmentItemText, styles.segmentItemTextOption]}>Weibl.</Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              onPress ={() => this._onPressGender(1)}
+              style={[styles.segmentItem, styles.segmentSelected]}>
+              <Text style={[styles.segmentItemText, styles.segmentItemTextSelected]}>Männl.</Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              onPress ={() => this._onPressGender(2)}
+              style={[styles.segmentItem, styles.segmentOption]}>
+              <Text style={[styles.segmentItemText, styles.segmentItemTextOption]}>Geheim</Text>
+            </TouchableHighlight>
+          </View>
+        );
         break;
       default:
-        gender = 'nicht angegeben';
+        gender = (
+          <View style={styles.segment}>
+            <TouchableHighlight
+              onPress ={() => this._onPressGender(0)}
+              style={[styles.segmentItem, styles.segmentOption]}>
+              <Text style={[styles.segmentItemText, styles.segmentItemTextOption]}>Weibl.</Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              onPress ={() => this._onPressGender(1)}
+              style={[styles.segmentItem, styles.segmentOption, styles.segmentSeparator]}>
+              <Text style={[styles.segmentItemText, styles.segmentItemTextOption]}>Männl.</Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              onPress ={() => this._onPressGender(2)}
+              style={[styles.segmentItem, styles.segmentSelected]}>
+              <Text style={[styles.segmentItemText, styles.segmentItemTextSelected]}>Geheim</Text>
+            </TouchableHighlight>
+          </View>
+        );
     }
     var updateBtn = this.state.modified ? (
       <TouchableHighlight
@@ -193,7 +255,7 @@ var Profile = React.createClass({
           </View>
           <View style={styles.contentLine}>
             <View style={styles.contentLeft}><Text style={styles.textLeft}>Geschlecht:</Text></View>
-            <View style={styles.contentRight}><Text style={styles.textRight}>{gender}</Text></View>
+            <View style={styles.contentRight}>{gender}</View>
           </View>
           <View style={styles.contentLine}>
             <View style={styles.contentLeft}><Text style={styles.textLeft}>Passwort:</Text></View>
@@ -267,6 +329,36 @@ var styles = StyleSheet.create({
         textRight: {
           color: '#01577A'
         },
+        segment: {
+          flexDirection: 'row',
+          borderWidth: 1,
+          borderColor: '#01577A',
+          borderRadius: 6,
+          overflow: 'hidden'
+        },
+          segmentItem: {
+            flex: 1
+          },
+          segmentItemText: {
+            textAlign: 'center',
+            padding: 8,
+          },
+          segmentItemTextSelected: {
+            color: '#9DC02E',
+          },
+          segmentItemTextOption: {
+            color: '#01577A'
+          },
+          segmentSeparator: {
+            borderLeftColor: '#01577A',
+            borderLeftWidth: 1
+          },
+          segmentOption: {
+            backgroundColor: '#9DC02E'
+          },
+          segmentSelected: {
+            backgroundColor: '#01577A'
+          },
       listViewHeader: {
         paddingLeft: 10,
         paddingTop: 5,
