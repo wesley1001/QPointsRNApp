@@ -17,6 +17,7 @@ export function initStorage(){
 	    DB.user.add({
 	      userEmail: 'kim.sora@web.de',
 	      userPW: '1234',
+	      userName: '',
 	      userToken: '',
 				userRole: '',
 	      loggedIn: false,

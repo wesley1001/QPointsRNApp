@@ -25,7 +25,7 @@ var styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#9DC02E',
-  };
+  }
 });
 
 module.exports = Scan;

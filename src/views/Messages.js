@@ -85,6 +85,14 @@ var Messages = React.createClass({
     );
   },
 
+  _renderHeader(){
+    return (
+      <View style={styles.listViewHeader}>
+        <Text style={styles.headerText}>MEINE BOTSCHAFTEN</Text>
+      </View>
+    )
+  },
+
   _itemPressed: function(rowID) {
     this.props.navigator.push({ id: 'Message', data: this.state.dataSource._dataBlob.s1[rowID] });
     DB.userData.findById(1).then((response) => {
@@ -106,6 +114,7 @@ var Messages = React.createClass({
       	<ListView
           dataSource={this.state.dataSource}
           renderRow={this._renderRow}
+          renderHeader={this._renderHeader}
           />
       </View>
     );
@@ -120,6 +129,16 @@ var styles = StyleSheet.create({
     borderBottomColor: 'white',
     borderBottomWidth: 1,
   },
+  listViewHeader: {
+    paddingLeft: 10,
+    paddingTop: 5,
+    paddingBottom: 5,
+    backgroundColor: '#FF2B4B'
+  },
+  headerText: {
+    color: 'white',
+    fontSize: 18
+  }
 });
 
 module.exports = Messages;

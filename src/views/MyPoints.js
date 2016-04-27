@@ -6,6 +6,7 @@ import MyPointItem from '../components/MyPointItem';
 import Storage from 'react-native-store';
 import {getUserData} from '../components/ApiUtils';
 import {isOk} from '../components/IsConnected';
+import {isHeight} from '../components/CheckDimensions';
 
 var {
   ListView,
@@ -18,6 +19,14 @@ const DB = {
   'user': Storage.model('user'),
   'userData': Storage.model('userData')
  };
+
+ var currentHeight = isHeight();
+ var textSizeH;
+ if (currentHeight < 530) {
+  textSizeH = 16;
+ } else {
+  textSizeH = 18;
+ }
 
 var MyPoints = React.createClass({
   
@@ -82,8 +91,17 @@ var MyPoints = React.createClass({
       <MyPointItem 
         rowID={rowID}
         programData={rowData}
-        onClick={this._itemPressed}/>
+        onClick={this._itemPressed}
+        currentHeight={currentHeight} />
     );
+  },
+
+  _renderHeader(){
+    return (
+      <View style={styles.listViewHeader}>
+        <Text style={[styles.headerText, {fontSize: textSizeH}]}>MEINE PROGRAMME</Text>
+      </View>
+    )
   },
 
   _itemPressed: function(rowID) {
@@ -117,6 +135,7 @@ var MyPoints = React.createClass({
           dataSource={this.state.dataSource}
           onScroll={this._handleScroll}
           renderRow={this._renderRow}
+          renderHeader={this._renderHeader}
           />
       </View>
     );
@@ -130,6 +149,16 @@ var styles = StyleSheet.create({
     borderBottomColor: 'white',
     borderBottomWidth: 1,
   },
+  listViewHeader: {
+    paddingLeft: 10,
+    paddingTop: 5,
+    paddingBottom: 5,
+    backgroundColor: '#FF2B4B'
+  },
+  headerText: {
+    color: 'white',
+    // fontSize: textSizeH // 16 vs 18
+  }
 });
 
 module.exports = MyPoints;
