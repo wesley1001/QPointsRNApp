@@ -8,6 +8,7 @@ import {initStorage} from '../components/initStorage';
 import {isOk} from '../components/IsConnected';
 
 var {
+  Alert,
   AsyncStorage,
   StyleSheet,
   Text,
@@ -144,6 +145,10 @@ var Login = React.createClass({
               .catch((err) => console.log(`Did not receive userData: ${err}`));
             return;
           } else {
+            console.log(response.message);
+            Alert.alert('Bitte versuchen Sie es erneut', response.message,
+              [{text: 'OK', onPress: () => {}}]
+            );
           }
         })
         .catch((err) => console.log(`There was an error: ${err}`));
@@ -165,12 +170,6 @@ var Login = React.createClass({
   },
 
   render: function() {
-    var warningText;
-    if (this.state.error){
-      warningText = (<Text style={styles.warningText}>{this.state.error}</Text>);
-    } else {
-      warningText = (<Text style={styles.warningText}></Text>);
-    }
     return (
       <View style={styles.container}>
       	<TextInput
@@ -194,7 +193,6 @@ var Login = React.createClass({
           onPress ={() => this._onPressSignin()} >
           <Text style={styles.buttonText} >Konto erstellen</Text>
         </TouchableHighlight>
-        {warningText}
       </View>
     );
   }
