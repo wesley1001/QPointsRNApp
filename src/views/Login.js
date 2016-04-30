@@ -109,14 +109,10 @@ var Login = React.createClass({
     }
   },
 
-  _saveToken(token, role){
-    let gender = this.state.gender;
-    if (this.state.userEmail === this.state.oldUser) {
-      gender = this.state.userGender;
-    }
+  _saveToken(token, role, name){
     DB.user.updateById({
       userEmail: this.state.userEmail,
-      userName: this.state.userName,
+      userName: name,
       userPW: this.state.userPW,
       userRole: role,
       userToken: token,
@@ -137,9 +133,11 @@ var Login = React.createClass({
               userRole: response.role,
               userName: response.name
             });
-            this._saveToken(response.token, response.role);
+            this._saveToken(response.token, response.role, response.name);
             getUserData(response.token)
               .then((respData) => {
+                console.log('this is Data API sent back');
+                console.log(respData);
                 this._handleResponse(respData);
               })
               .catch((err) => console.log(`Did not receive userData: ${err}`));
