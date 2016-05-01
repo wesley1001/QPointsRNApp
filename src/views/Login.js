@@ -8,6 +8,7 @@ import {initStorage} from '../components/initStorage';
 import {isOk} from '../components/IsConnected';
 
 var {
+  Alert,
   AsyncStorage,
   StyleSheet,
   Text,
@@ -108,14 +109,10 @@ var Login = React.createClass({
     }
   },
 
-  _saveToken(token, role){
-    let gender = this.state.gender;
-    if (this.state.userEmail === this.state.oldUser) {
-      gender = this.state.userGender;
-    }
+  _saveToken(token, role, name){
     DB.user.updateById({
       userEmail: this.state.userEmail,
-      userName: this.state.userName,
+      userName: name,
       userPW: this.state.userPW,
       userRole: role,
       userToken: token,
@@ -136,14 +133,20 @@ var Login = React.createClass({
               userRole: response.role,
               userName: response.name
             });
-            this._saveToken(response.token, response.role);
+            this._saveToken(response.token, response.role, response.name);
             getUserData(response.token)
               .then((respData) => {
+                console.log('this is Data API sent back');
+                console.log(respData);
                 this._handleResponse(respData);
               })
               .catch((err) => console.log(`Did not receive userData: ${err}`));
             return;
           } else {
+            console.log(response.message);
+            Alert.alert('Bitte versuchen Sie es erneut', response.message,
+              [{text: 'OK', onPress: () => {}}]
+            );
           }
         })
         .catch((err) => console.log(`There was an error: ${err}`));
@@ -165,12 +168,6 @@ var Login = React.createClass({
   },
 
   render: function() {
-    var warningText;
-    if (this.state.error){
-      warningText = (<Text style={styles.warningText}>{this.state.error}</Text>);
-    } else {
-      warningText = (<Text style={styles.warningText}></Text>);
-    }
     return (
       <View style={styles.container}>
       	<TextInput
@@ -194,7 +191,6 @@ var Login = React.createClass({
           onPress ={() => this._onPressSignin()} >
           <Text style={styles.buttonText} >Konto erstellen</Text>
         </TouchableHighlight>
-        {warningText}
       </View>
     );
   }

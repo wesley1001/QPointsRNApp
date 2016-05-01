@@ -61,6 +61,13 @@ var Profile = React.createClass({
     });
   },
 
+  _handleNameInput(inputName){
+    this.setState({
+      userName: inputName,
+      modified: true
+    });
+  },
+
   _handlePWInput(inputText){
     this.setState({
       userPW: inputText,
@@ -80,30 +87,30 @@ var Profile = React.createClass({
     DB.user.updateById({
       loggedIn: false 
     },1).then(() => {
-      DB.userData.findById(1).then((response) => {
-        this.props.navigator.replace({id: 'Login'});
-      });
+      this.props.navigator.replace({id: 'Login'});
     });
   },
 
-  _storeAndExit(response){
+  _storeAndExit(){
     var PW = this.state.userPW !== '' ? this.state.userPW : this.state.currentPW;
     DB.user.updateById({
       userEmail: this.state.userEmail,
       userPW: PW,
-      userRole: this.state.userRole,
       userToken: this.state.userToken,
-      loggedIn: true
-    },1);
-    DB.userData.updateById({
-      userGender: this.state.userGender,
-      userPoints: this.state.userPoints,
-      userMessages: this.state.userMessages,
-      lastSync: this.state.lastSync
+      userRole: this.state.userRole,
+      loggedIn: true,
+      userName: this.state.userName
     },1).then(() => {
-      Alert.alert('Hinweis', 'Profil wurde aktualisiert',
-        [{text: 'OK', onPress: () => { this.props.navigator.pop()}}]
-      );
+      DB.userData.updateById({
+        userGender: this.state.userGender,
+        userPoints: this.state.userPoints,
+        userMessages: this.state.userMessages,
+        lastSync: this.state.lastSync
+      },1).then(() => {
+        Alert.alert('Hinweis', 'Profil wurde aktualisiert',
+          [{text: 'OK', onPress: () => { this.props.navigator.pop()}}]
+        );
+      });
     });
   },
 
@@ -111,10 +118,9 @@ var Profile = React.createClass({
     this.setState({ modified: false });
     if (this.state.userPW2===this.state.userPW){
       if (isOk()) {
-        updateProfile(this.state.userGender, this.state.userPW, this.state.userToken)
+        updateProfile(this.state.userName, this.state.userGender, this.state.userPW, this.state.userToken)
           .then((resp) => {
-            console.log(resp);
-            this._storeAndExit(resp)
+            this._storeAndExit()
           })
           .catch((err) => {
             console.log(err);
@@ -247,7 +253,15 @@ var Profile = React.createClass({
           </View>
           <View style={styles.contentLine}>
             <View style={styles.contentLeft}><Text style={styles.textLeft}>Name:</Text></View>
-            <View style={styles.contentRight}><Text style={styles.textRight}>{this.state.userName}</Text></View>
+            <View style={styles.contentRight}>
+              <TextInput 
+                keyboardType='default'
+                style={styles.inputText}
+                secureTextEntry={false}
+                placeholder= {this.state.userName}
+                placeholderTextColor= '#01577A'
+                onChangeText={(text) => this._handleNameInput(text)} />
+            </View>
           </View>
           <View style={styles.contentLine}>
             <View style={styles.contentLeft}><Text style={styles.textLeft}>Rolle:</Text></View>

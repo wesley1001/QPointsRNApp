@@ -62,12 +62,12 @@ export function getMessages(token) {
 	});
 }
 
-export function updateProfile(gender, newPW, token) {
+export function updateProfile(name, gender, newPW, token) {
 	let source = 'http://' + serverHost + ':3000/api/v2/user';
 	return fetch(source, {
 		method: 'POST',
 		headers: { 'Accept': '*/*', 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-		body: JSON.stringify({ gender: gender, passwordNew: newPW })
+		body: JSON.stringify({ gender: gender, passwordNew: newPW, name: name})
 	}).then((response) => {
 			let json = response.json();
 		  if (response.status >= 200 && response.status < 300) {
